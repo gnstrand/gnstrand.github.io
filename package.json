@@ -1,0 +1,5 @@
+{
+  "dependencies": {"gh-pages": "^6.0.0"}
+  "homepage": {"https://gnstrand.github.io"}
+  "publish": {"gh-pages -d src"}
+}

@@ -1,0 +1,2077 @@
+
+<!DOCTYPE html>
+<!-- html manifest="WHSFlashcard.appcache" --> 
+<head>
+ 	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/> 
+	<meta name="apple-mobile-web-app-capable" content="yes" /> 
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" /> 
+	<!-- link rel="apple-touch-icon" href="iphon_tetris_icon.png" --> 
+	<!-- link rel="apple-touch-startup-image" href="startup.png" --> 
+
+  <title>Flashcard App</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+	.wrapper {
+		position: relative;
+  		/* 
+		display: flex;
+  		flex-direction: column;
+  		align-items: center;
+		*/
+	}
+
+  .flashcard {
+  	position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    width: 340px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    padding: 20px;
+    margin: 10px;
+		color: red;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+   }
+	
+	label {
+  		display: inline-block;
+  		width: 200px; /* set the width as per your requirement */
+  		text-align: left;
+  		margin-right: 10px; /* add some spacing between label and input control */
+		padding-left: 10px;
+	}
+
+  h2 {
+  	display: flex;
+  	font-family: serif;
+  	width: 340px;
+  	align-items: center;
+  	margin-left: 45px;
+  	/* justify-content: center; */
+  	color: red;
+  	animation: titleMove 3s;
+  }
+
+
+	@keyframes titleMove {
+ 		from {color: green;}
+ 		to {color: red}
+
+ 		0%   {margin-left: 0px;}
+  	33%  {margin-left: 90px;}
+ 		66%  {margin-left: 0px;}
+ 		100% {margin-left: 45px}
+ 	}
+
+
+	select {
+		color: black;
+		width: 150px;
+		font-size: 0.8em;
+		padding: 0;
+	}
+	
+	.answer {
+		color: green;
+		text-align: center;
+		height: 20px;
+		display: block;
+	}
+
+	.question {
+		color: red;
+		text-align: center;
+		height: 20px;
+		display: block;
+	}
+
+	.review {
+		visibility: visible;
+ 		font-family: Sans-Serif;
+ 		font-size: 0.8em;
+ 		position: absolute;
+ 		bottom: 2px;
+ 		right: 10px;
+ 		width: 170px;
+ 		height: 15px;
+	}  
+
+	.button {
+		display: block;
+		width: 340px;
+		height: 10px;
+		padding: 20px;
+		margin: 10px;
+		text-align: center;
+		align-items: center;
+    justify-content: center; 
+		font-size: 1.8em;
+		font-weight: bold;
+	}
+
+
+	.tooltip {
+  	position: relative;
+  	display: inline-block;
+  	/* border-bottom: 1px dotted black; */
+	}
+
+	.tooltip .tooltiptext {
+		visibility: hidden;
+ 		width: 366px;
+  	background-color: #cee;
+  	color: black;
+  	text-align: left;
+  	border-radius: 6px;
+  	padding: 5px;
+  	margin: 5px;
+  	font-family: Sans-Serif;
+  	font-size: 0.8em;
+  	/* Position the tooltip */
+  	position: absolute;
+  	z-index: 1;
+  	top: 80%;
+  	/* left:0%; */
+  	/* margin-left: -150px; */
+
+}
+
+	.tooltip:hover .tooltiptext {
+ 	 visibility: visible;
+	}
+
+  </style>
+</head>
+
+
+<body onload="initControls()">
+
+	<div class="tooltip">
+		<h2>Warren Hardy Flash Cards</h2>
+		<span class="tooltiptext">
+			This is the placeholder text describing the functioning of the app.<p>
+	 		This app is designed to mimic the 100 cards in the flash card deck that is used widely at
+	  <span style="font-weight: bold">Warren Hardy School</span> in San Miguel de Allende, Mexico.
+		</span>
+	</div>
+	<br>
+
+	<label id="lbl0" for="timer">Choose direction:</label>&nbsp;
+	<select onchange="translation_check()" id="translation" name="translation">
+		<option value="1">English to Spanish</option>
+		<option value="2">Spanish to English</option>
+	</select>
+	<br>
+
+	<label id="lbl0a" for="timer">Choose presentation order:</label>&nbsp;
+	<select onchange="presentation_check()" id="presentation" name="presentation">
+		<option value="1">Random</option>
+		<option value="2">Rolodex</option>
+	</select>
+	<br>
+
+
+	<label id="lbl0b" for="ddSubset">Choose a filter:</label>&nbsp;
+	<select onchange="update_subset_check()" name="ddSubset" id="ddSubset">
+		<option value="">------ No Filters -----</option>
+		<option value="special">Special Cards</option>
+		<option value="normal">Normal Cards</option>
+		<option value="white">White Cards</option>
+		<option value="blue">Blue Cards</option>
+		<option value="pink">Pink Cards</option>
+		<option value="yellow">Yellow Cards</option>
+		<option value="review">Review List</option>
+	</select>
+	<br>
+
+
+	<label  id="lbl1" for="ddVerbs">Choose a verb:</label>&nbsp;
+	<select onchange="update_verb_check()" name="ddVerbs" id="ddVerbs">
+		<option value="">------ All Verbs -----</option>
+	</select>
+	<br>
+	
+	<label id="lbl1a" for="ddTenses">Choose a tense:</label>&nbsp;
+	<select onchange="update_tense_check()" name="ddTenses" id="ddTenses"> 
+		<option value="">------ All Tenses -----</option>
+	</select>
+	<br>
+	
+	<label id="lbl1b" for="ddPersons">Choose a person:</label>&nbsp;
+	<select onchange="update_person_check()" name="ddPersons" id="ddPersons"> 
+		<option value="">----- All Persons ----</option>
+	</select>
+	<br>
+	
+	<label id="lbl2" for="timer">Choose a time delay:</label>&nbsp;
+	<select onchange="timer_check()" id="timer" name="timer">
+		<option value="0" selected>No delay</option>
+		<option value="1">1 second</option>
+ 		<option value="2">2 seconds</option>
+		<option value="3">3 seconds</option>
+		<option value="4">4 seconds</option>
+		<option value="5">5 seconds</option>
+		<option value="6">6 second</option>
+ 		<option value="7">7 seconds</option>
+		<option value="8">8 seconds</option>
+		<option value="9">9 seconds</option>
+		<option value="10">10 seconds</option>
+		<option value="answer">Use 'Answer' Button</option>
+	</select>
+	<br>
+
+	<label id="lbl3" for="infinitiveOnly">Infinitive Only?:</label>&nbsp;
+	<select onchange="infinitive_only_check()" id="infinitiveOnly" name="infinitiveOnly">
+		<option value="0" selected>No</option>
+		<option value="1">Yes</option>
+	</select>
+
+
+  <div id="wrapper">  
+  	<div id="flashcard-container"></div>
+		<div class="button">
+  			<button id="new-card-btn">New Card</button>
+  			<br>
+   			<button id="show-answer-btn">Show Answer</button>
+		</div>
+	</div>	
+
+
+<script>
+
+// *********************************************************************************
+//
+// Define the constants, including array and single values. This is the data portion
+// of the progam. All verbs, tenses, persons, and translations are found here.
+//
+// *********************************************************************************
+
+
+const persons = [
+	{ spName: "Yo",			enName: "I",              reflexive: "me", person: 0 },
+	{ spName: "T&uacute;", enName: "You <i>(t&uacute;)</i>", reflexive: "te", person: 1 },
+	{ spName: "&Eacute;l", enName: "He",             reflexive: "se", person: 2 }, 
+ 	{ spName: "Ella", 		enName: "She",            reflexive: "se", person: 2 },
+	{ spName: "Ud.", 			enName: "You <i>(Ud.)</i>", reflexive: "se", person: 2 },
+	{ spName: "Nosotros", 	enName: "We",             reflexive: "nos", person: 3 },
+	{ spName: "Ellos", 		enName: "They <i>(m)</i>",reflexive: "se", person: 4 },
+	{ spName: "Ellas", 		enName: "They <i>(f)</i>",reflexive: "se", person: 4 },
+	{ spName: "Uds.", 		enName: "You all",        reflexive: "se", person: 4 }
+];
+		 
+// *********************************************************************************
+//
+//
+//
+//
+// *********************************************************************************
+
+
+
+// Person Constants (for Spanish verbs)
+const cYo = 0;
+const cTu = 1;
+const cEl = 2;
+const cNosotros = 3;
+const cEllos = 4;
+
+const cPersonCount = 5;
+				
+// Tense Constants
+const cPresent = 0;
+const cImperfect = 1;
+const cPast = 2;
+const cFuture = 3;
+const cConditional = 4;
+const cPresent_Progressive = 5;
+const cPresent_Perfect = 6;
+		
+const cTenseCount = 7;
+
+const tenses = [
+	{ name: "Present" },
+	{ name: "Imperfect" },
+	{ name: "Past" },
+	{ name: "Future" },
+	{ name: "Conditional" },
+	{ name: "Present Progressive" },
+	{ name: "Present Perfect" }
+] ;
+		
+// *********************************************************************************
+//
+//
+//
+//
+// *********************************************************************************
+
+
+
+const spVerbs = [
+{spName: "Abrir", special:"0", cardColor:"blue", review: false},
+{spName: "Acostarse", special: "0", cardColor: "yellow", sp1pStem: "Acuest", review: false},
+{spName: "Aprender", special:"0", cardColor:"blue", review: false},
+{spName: "Arreglar", special:"0", cardColor:"white", review: false},
+{spName: "Ayudar", special:"0", cardColor:"white", review: false},
+{spName: "Ba&ntilde;arse", special: "0", cardColor: "yellow", review: false},
+{spName: "Bailar", special:"0", cardColor:"white", review: false},
+{spName: "Bajar", special:"0", cardColor:"white", review: false},
+{spName: "Buscar", special:"0", cardColor:"white", sp1pPret: "Busqu&eacute;", review: false},
+{spName: "Cambiar", special:"0", cardColor:"white", review: false},
+{spName: "Caerse", special:"1", cardColor:"yellow", review: false},
+{spName: "Caminar", special:"0", cardColor:"white", review: false},
+{spName: "Cantar", special:"0", cardColor:"white", review: false},
+{spName: "Cerrar", special:"0", cardColor:"white",  sp1pStem: "Cierr", review: false},
+{spName: "Cocinar", special:"0", cardColor:"white", review: false},
+{spName: "Comer", special:"0", cardColor:"blue", review: false},
+{spName: "Comprar", special:"0", cardColor:"white", review: false},
+{spName: "Conocer", special:"0", cardColor:"pink", sp1pPres: "Conozco", review: false},
+{spName: "Conseguir", special:"0", cardColor:"blue", sp1pStem: "Consigu", sp1pPres: "Consigo", sp3pPretStem: "Consigu", review: false},
+{spName: "Contestar", special:"0", cardColor:"white", review: false},
+{spName: "Correr", special:"0", cardColor:"blue", review: false},
+{spName: "Creer", special:"0", cardColor:"blue", review: false},
+{spName: "Dar", special:"1", cardColor:"pink", review: false},
+{spName: "Decidir", special:"0", cardColor:"blue", review: false},
+{spName: "Decir", special:"1", cardColor:"pink", review: false},
+{spName: "Dejar", special:"0", cardColor:"white", review: false},
+{spName: "Descansar", special:"0", cardColor:"white", review: false},
+{spName: "Divertirse", special:"0", cardColor:"yellow", sp1pStem: "Diviert", review: false},
+{spName: "Dormir", special:"0", cardColor:"blue", sp1pStem: "Duerm", sp3pPretStem: "Durm", spGerund: "Durmiendo" , review: false},
+{spName: "Empezar", special:"0", cardColor:"white", sp1pStem: "Empiez", sp1pPret: "Empec&eacute;", review: false},
+{spName: "Encontrar", special:"0", cardColor:"white", sp1pStem: "Encuentr", review: false},
+{spName: "Enfermarse", special:"0", cardColor:"yellow", review: false},
+{spName: "Entender", special:"0", cardColor:"blue", review: false},
+{spName: "Eschuchar", special:"0", cardColor:"white", review: false},
+{spName: "Escribir", special:"0", cardColor:"blue", review: false},
+{spName: "Esperar", special:"0", cardColor:"white", review: false},
+{spName: "Estar", special:"1", cardColor:"pink", review: false},
+{spName: "Estudiar", special:"0", cardColor:"white", review: false},
+{spName: "Firmar", special:"0", cardColor:"white", review: false},
+{spName: "Ganar", special:"0", cardColor:"white", review: false},
+{spName: "Gastar", special:"0", cardColor:"white", review: false},
+{spName: "Hablar", special:"0", cardColor:"white", review: false},
+{spName: "Hacer", special:"1", cardColor:"pink", review: false},
+{spName: "Invitar", special:"0", cardColor:"white", review: false},
+{spName: "Ir", special:"1", cardColor:"pink", review: false},
+{spName: "Jugar", special:"0", cardColor:"white", sp1pStem: "Jueg", sp1pPret: "Jugu&eacute;", review: false},
+{spName: "Lavarr", special:"0", cardColor:"white", review: false},
+{spName: "Leer", special:"1", cardColor:"pink", review: false},
+{spName: "Levantarse", special:"0", cardColor:"yellow", review: false},
+{spName: "Limpiar", special:"0", cardColor:"white", review: false},
+{spName: "LLegar", special:"0", cardColor:"white", sp1pPret: "Llequ&eacute;", review: false},
+{spName: "Llenar", special:"0", cardColor:"white", review: false},
+{spName: "Llevar", special:"0", cardColor:"white", review: false},
+{spName: "Mandar", special:"0", cardColor:"white", review: false},
+{spName: "Manejar", special:"0", cardColor:"white", review: false},
+{spName: "Mover", special:"0", cardColor:"blue", review: false},
+{spName: "Mudarser", special:"0", cardColor:"yellow", review: false},
+{spName: "Necesitar", special:"0", cardColor:"white", review: false},
+{spName: "Oir", special:"1", cardColor:"pink", review: false},
+{spName: "Olvidar", special:"0", cardColor:"white", review: false},
+{spName: "Ordenar", special:"0", cardColor:"white", review: false},
+{spName: "Pagar", special:"0", cardColor:"white", sp1pPret: "Pagu&eacute;", review: false},
+{spName: "Pasar", special:"0", cardColor:"white", review: false},
+{spName: "Pedir", special:"0", cardColor:"blue", sp1pStem: "Pid", sp3pPretStem: "Pid", review: false},
+{spName: "Pensar", special:"0", cardColor:"white", review: false},
+{spName: "Perder", special:"0", cardColor:"blue", sp1pStem: "Pierd", review: false},
+{spName: "Platicar", special:"0", cardColor:"white", sp1pPret: "Platiqu&eacute;", review: false},
+{spName: "Poder", special:"1", cardColor:"pink", review: false},
+{spName: "Poner", special:"1", cardColor:"pink", review: false},
+{spName: "Preguntar", special:"0", cardColor:"white", review: false},
+{spName: "Preparar", special:"0", cardColor:"white", review: false},
+{spName: "Presentar", special:"0", cardColor:"white", review: false},
+{spName: "Probar", special:"0", cardColor:"white", sp1pStem: "Prueb", review: false},
+{spName: "Querer", special:"1", cardColor:"pink", review: false},
+{spName: "Quitar", special:"0", cardColor:"white", review: false},
+{spName: "Recibir", special:"0", cardColor:"blue", review: false},
+{spName: "Recomendar", special:"0", cardColor:"white", review: false},
+{spName: "Recordar", special:"0", cardColor:"white", sp1pStem: "Recuerd", review: false},
+{spName: "Regresar", special:"0", cardColor:"white", review: false},
+{spName: "Saber", special:"1", cardColor:"pink", review: false},
+{spName: "Sacar", special:"0", cardColor:"white", sp1pPret: "Saqu&eacute;", review: false},
+{spName: "Salir", special:"0", cardColor:"blue", sp1pPres: "Salgo", spFutCondStem: "Saldr", review: false},
+{spName: "Seguir", special:"0", cardColor:"blue", sp1pStem: "Sigu", sp1pPres: "Sigo", sp3pPretStem: "Sigu", review: false},
+{spName: "Sentarse", special:"0", cardColor:"yellow", sp1pStem: "Sient", review: false},
+{spName: "Ser", special:"1", cardColor:"pink", review: false},
+{spName: "Subir", special:"0", cardColor:"blue", review: false},
+{spName: "Tener", special:"1", cardColor:"pink", review: false},
+{spName: "Terminar", special:"0", cardColor:"white", review: false},
+{spName: "Tocar", special:"0", cardColor:"white", sp1pPret: "Toqu&eacute;", review: false},
+{spName: "Tomar", special:"0", cardColor:"white", review: false},
+{spName: "Trabajar", special:"0", cardColor:"white", review: false},
+{spName: "Traer", special:"1", cardColor:"pink", review: false},
+{spName: "Tratar", special:"0", cardColor:"white", review: false},
+{spName: "Usar", special:"0", cardColor:"white", review: false},
+{spName: "Vender", special:"0", cardColor:"blue", review: false},
+{spName: "Venir", special:"1", cardColor:"pink", review: false},
+{spName: "Ver", special:"1", cardColor:"blue", review: false},
+{spName: "Viajar", special:"0", cardColor:"white", review: false},
+{spName: "Visitar", special:"0", cardColor:"white", review: false},
+{spName: "Vivir", special:"0", cardColor:"blue", review: false}
+] ;
+
+
+// *********************************************************************************
+//
+//
+//
+//
+// *********************************************************************************
+
+
+const aryIrregs = [
+	{name: "Ir", type: "irreg", gerund: "yendo", participle: "ido", tenses: [
+	 ["Voy", "Vas", "Va", "Vamos", "Van"],
+    ["Iba", "Ibas", "Iba", "&Iacute;bamos", "Iban"],
+    ["Fui", "Fuiste", "Fue", "Fuimos", "Fueron"],
+    ["Ir&eacute;", "Ir&aacute;s", "Ir&aacute;", "Iremos", "Ir&aacute;n"],
+    ["Ir&iacute;a", "Ir&iacute;as", "Ir&iacute;a", "Ir&iacute;amos", "Ir&iacute;an"]
+	]
+	},
+	
+	{name: "Ser", type: "irreg", gerund: "siendo", participle: "sido", tenses: [
+	 ["Soy", "Eres", "Es", "Somos", "Son"],
+    ["Era", "Eras", "Era", "&Eacute;ramos", "Eran"],
+    ["Fui", "Fuiste", "Fue", "Fuimos", "Fueron"],
+    ["Ser&eacute;", "Ser&aacute;s", "Ser&aacute;", "Seremos", "Ser&aacute;n"],
+    ["Ser&iacute;a", "Ser&iacute;as", "Ser&iacute;a", "Ser&iacute;amos", "Ser&iacute;an"]
+	]
+	},
+	
+	{name: "Estar", type: "irreg", gerund: "estando", participle: "estado", tenses: [
+	 ["Estoy", "Est&aacute;s", "Est&aacute", "Estamos", "Est&aacute;n"],
+    ["Estaba", "Estabas", "Estaba", "Est&aacute;bamos", "Estaban"],
+    ["Estuve", "Estuviste", "Estuvo", "Estuvimos", "Estuvieron"],
+    ["Estar&eacute;", "Estar&aacute;s", "Estar&aacute;", "Estaremos", "Estar&aacute;n"],
+    ["Estar&iacute;a", "Estar&iacute;as", "Estar&iacute;a", "Estar&iacute;amos", "Estar&iacute;an"]
+	]
+	},
+	
+	{name: "Dar", type: "irreg", gerund: "dando", participle: "dado", tenses: [
+	 ["Doy", "Das", "Da", "Damos", "Dan"],
+    ["Daba", "Dabas", "Daba", "D&aacute;bamos", "Daban"],
+    ["Di", "Diste", "Dio", "Dimos", "Dieron"],
+    ["Dar&eacute;", "Dar&aacute;s", "Dar&aacute;", "Daremos", "Dar&aacute;n"],
+    ["Dar&iacute;a", "Dar&iacute;as", "Dar&iacute;a", "Dar&iacute;amos", "Dar&iacute;an"]
+	]
+	},
+	
+	{name: "Ver", type: "irreg", gerund: "viendo", participle: "visto", tenses: [
+	 ["Veo", "Ves", "Ve", "Vemos", "Ven"],
+	 ["Ve&iacute;a", "Ve&iacute;as", "Ve&iacute;a", "Ve&iacute;amos", "Ve&iacute;an"],
+    ["V&iacute;", "Viste", "Vi&oacute;", "Vimos", "Vieron"],
+    ["Ver&eacute;", "Ver&aacute;s", "Ver&aacute;", "Veremos", "Ver&aacute;n"],
+    ["Ver&iacute;a", "Ver&iacute;as", "Ver&iacute;a", "Ver&iacute;amos", "Ver&iacute;an"]
+	]
+	},
+	
+	{name: "Poder", type: "irreg", gerund: "pudiendo", participle: "podido", tenses: [
+	 ["Puedo", "Puedes", "Puede", "Podemos", "Pueden"],
+	 ["Pod&iacute;a", "Pod&iacute;as", "Pod&iacute;a", "Pod&iacute;amos", "Pod&iacute;an"],
+    ["Pude", "Pudiste", "Pudo", "Pudimos", "Pudieron"],
+    ["Podr&eacute;", "Podr&aacute;s", "Podr&aacute;", "Podremos", "Podr&aacute;n"],
+    ["Podr&iacute;a", "Podr&iacute;as", "Podr&iacute;a", "Podr&iacute;amos", "Podr&iacute;an"]
+	]
+	},
+	
+	{name: "Traer", type: "irreg", gerund: "trayendo", participle: "tra&iacute;do", tenses: [
+	 ["Traigo", "Traes", "Trae", "Traemos", "Traen"],
+	 ["Tra&iacute;a", "Tra&iacute;as", "Tra&iacute;a", "Tra&iacute;amos", "Tra&iacute;an"],
+    ["Traje", "Trajiste", "Trajo", "Trajimos", "Trajeron"],
+    ["Traer&eacute;", "Traer&aacute;s", "Traer&aacute;", "Traeremos", "Traer&aacute;n"],
+    ["Traer&iacute;a", "Traer&iacute;as", "Traer&iacute;a", "Traer&iacute;amos", "Traer&iacute;an"]
+	]
+	},
+	
+	{name: "Poner", type: "irreg", gerund: "poniendo", participle: "puesto", tenses: [
+	 ["Pongo", "Pones", "Pone", "Ponemos", "Ponen"],
+	 ["Pon&iacute;a", "Pon&iacute;as", "Pon&iacute;a", "Pon&iacute;amos", "Pon&iacute;an"],
+    ["Puse", "Pusiste", "Puso", "Pusimos", "Pusieron"],
+    ["Pondr&eacute;", "Pondr&aacute;s", "Pondr&aacute;", "Pondremos", "Pondr&aacute;n"],
+    ["Pondr&iacute;a", "Pondr&iacute;as", "Pondr&iacute;a", "Pondr&iacute;amos", "Pondr&iacute;an"]
+	]
+	},
+	
+	{name: "Venir", type: "irreg", gerund: "viniendo", participle: "venido", tenses: [
+	 ["Vengo", "Vienes", "Viene", "Venimos", "Vienen"],
+	 ["Ven&iacute;a", "Ven&iacute;as", "Ven&iacute;a", "Ven&iacute;amos", "Ven&iacute;an"],
+    ["Vine", "Viniste", "Vino", "Vinimos", "Vinieron"],
+    ["Vendr&eacute;", "Vendr&aacute;s", "Vendr&aacute;", "Vendremos", "Vendr&aacute;n"],
+    ["Vendr&iacute;a", "Vendr&iacute;as", "Vendr&iacute;a", "Vendr&iacute;amos", "Vendr&iacute;an"]
+	]
+	},
+	
+	{name: "Hacer", type: "irreg", gerund: "haciendo", participle: "hecho", tenses: [
+	 ["Hago", "Haces", "Hace", "Hacemos", "Hacen"],
+	 ["Hac&iacute;a", "Hac&iacute;as", "Hac&iacute;a", "Hac&iacute;amos", "Hac&iacute;an"],
+    ["Hice", "Hiciste", "Hizo", "Hicimos", "Hicieron"],
+    ["Har&eacute;", "Har&aacute;s", "Har&aacute;", "Haremos", "Har&aacute;n"],
+    ["Har&iacute;a", "Har&iacute;as", "Har&iacute;a", "Har&iacute;amos", "Har&iacute;an"]
+	]
+	},
+	 
+	{name: "Saber", type: "irreg", gerund: "sabiendo", participle: "sabido", tenses: [
+	 ["S&eacute;", "Sabes", "Sabe", "Sabemos", "Saben"],
+	 ["Sab&iacute;a", "Sab&iacute;as", "Sab&iacute;a", "Sab&iacute;amos", "Sab&iacute;an"],
+    ["Supe", "Supiste", "Supo", "Supimos", "Supieron"],
+    ["Sabr&eacute;", "Sabr&aacute;s", "Sabr&aacute;", "Sabremos", "Sabr&aacute;n"],
+    ["Sabr&iacute;a", "Sabr&iacute;as", "Sabr&iacute;a", "Sabr&iacute;amos", "Sabr&iacute;an"]
+	]
+	},
+	
+	{name: "Querer", type: "irreg", gerund: "queriendo", participle: "querido", tenses: [
+	 ["Quiero", "Quieres", "Quiere", "Queremos", "Quieren"],
+	 ["Quer&iacute;a", "Quer&iacute;as", "Quer&iacute;a", "Quer&iacute;amos", "Quer&iacute;an"],
+    ["Quise", "Quisiste", "Quiso", "Quisimos", "Quisieron"],
+    ["Querr&eacute;", "Querr&aacute;s", "Querr&aacute;", "Querremos", "Querr&aacute;n"],
+    ["Querr&iacute;a", "Querr&iacute;as", "Querr&iacute;a", "Querr&iacute;amos", "Querr&iacute;an"]
+	]
+	},
+	
+	{name: "Oir", type: "irreg", gerund: "oyendo", participle: "o&iacute;do", tenses: [
+	 ["Oigo", "Oyes", "Oye", "O&iacute;mos", "Oyen"],
+	 ["O&iacute;a", "O&iacute;as", "O&iacute;a", "O&iacute;amos", "O&iacute;an"],
+    ["O&iacute;", "O&iacute;ste", "Oy&oacute;", "O&iacute;mos", "Oyeron"],
+    ["Oir&eacute;", "Oir&aacute;s", "Oir&aacute;", "Oiremos", "Oir&aacute;n"],
+    ["Oir&iacute;a", "Oir&iacute;as", "Oir&iacute;a", "Oir&iacute;amos", "Oir&iacute;an"]
+	]
+	},
+	
+	{name: "Leer", type: "irreg", gerund: "leyendo", participle: "le&iacute;do", tenses: [
+	 ["Leo", "Lees", "Lee", "Leemos", "Leen"],
+	 ["Le&iacute;a", "Le&iacute;as", "Le&iacute;a", "Le&iacute;amos", "Le&iacute;an"],
+    ["Le&iacute;", "Le&iacute;ste", "Ley&oacute;", "Le&iacute;mos", "Leyeron"],
+    ["Leer&eacute;", "Leer&aacute;s", "Leer&aacute;", "Leeremos", "Leer&aacute;n"],
+    ["Leer&iacute;a", "Leer&iacute;as", "Leer&iacute;a", "Leer&iacute;amos", "Leer&iacute;an"]
+	]
+	},
+	
+	{name: "Caer", type: "irreg", gerund: "cay&eacute;ndo", participle: "ca&iacute;do", tenses: [
+	 ["Caigo", "Caes", "Cae", "Caemos", "Caen"],
+	 ["Ca&iacute;a", "Ca&iacute;as", "Ca&iacute;a", "Ca&iacute;amos", "Ca&iacute;an"],
+    ["Ca&iacute;", "Ca&iacute;ste", "Cay&oacute;", "Ca&iacute;mos", "Cayeron"],
+    ["Caer&eacute;", "Caer&aacute;s", "Caer&aacute;", "Caeremos", "Caer&aacute;n"],
+    ["Caer&iacute;a", "Caer&iacute;as", "Caer&iacute;a", "Caer&iacute;amos", "Caer&iacute;an"]
+	]
+	},
+	
+	{name: "Decir", type: "irreg", gerund: "diciendo", participle: "dicho", tenses: [
+	 ["Digo", "Dices", "Dice", "Decimos", "Dicen"],
+	 ["Dec&iacute;a", "Dec&iacute;as", "Dec&iacute;a", "Dec&iacute;amos", "Dec&iacute;an"],
+    ["Dije", "Dijiste", "Dijo", "Dijimos", "Dijeron"],
+    ["Dir&eacute;", "Dir&aacute;s", "Dir&aacute;", "Diremos", "Dir&aacute;n"],
+    ["Dir&iacute;a", "Dir&iacute;as", "Dir&iacute;a", "Dir&iacute;amos", "Dir&iacute;an"]
+	]
+	},
+	
+	{name: "Tener", type: "irreg", gerund: "teniendo", participle: "tenido", tenses: [
+	 ["Tengo", "Tienes", "Tiene", "Tenemos", "Tienen"],
+	 ["Ten&iacute;a", "Ten&iacute;as", "Ten&iacute;a", "Ten&iacute;amos", "Ten&iacute;an"],
+    ["Tuve", "Tuviste", "Tuvo", "Tuvimos", "Tuvieron"],
+    ["Tendr&eacute;", "Tendr&aacute;s", "Tendr&aacute;", "Tendremos", "Tendr&aacute;n"],
+    ["Tendr&iacute;a", "Tendr&iacute;as", "Tendr&iacute;a", "Tendr&iacute;amos", "Tendr&iacute;an"]
+	]
+	},
+	
+	{name: "Dormir", type: "irreg", gerund: "durmiendo", participle: "dormido", tenses: [
+	 ["Duermo", "Duermes", "Duerme", "Dormimos", "Duermen"],
+	 ["Dorm&iacute;a", "Dorm&iacute;as", "Dorm&iacute;a", "Dorm&iacute;amos", "Dorm&iacute;an"],
+    ["Dorm&iacute;", "Dormiste", "Durmi&oacute;", "Dormimos", "Durmieron"],
+    ["Dormir&eacute;", "Dormir&aacute;s", "Dormir&aacute;", "Dormiremos", "Dormir&aacute;n"],
+    ["Dormir&iacute;a", "Dormir&iacute;as", "Dormir&iacute;a", "Dormir&iacute;amos", "Dormir&iacute;an"]
+	]
+	}
+	
+];
+
+
+// *********************************************************************************
+//
+//
+//
+//
+// *********************************************************************************
+
+
+const enTrans = [
+	{spName: "Cerrar", enInf: "to close", enBase: "close", en3ps: "closes", enPast: "closed", enPp: "closed", enGerund: "closing" },
+	{spName: "Tomar",  enInf: "to take", enBase: "take", en3ps: "takes", enPast: "took", enPp: "taken", enGerund: "taking"},
+	{spName: "Hablar", enInf: "to speak", enBase: "speak", en3ps: "speaks", enPast: "spoke", enPp: "spoken"},
+	{spName: "Comer",  enInf: "to eat",   enBase: "eat", en3ps: "eats", enPast: "ate", enPp: "eaten"},
+	{spName: "Vivir",  enInf: "to live",  enBase: "live", en3ps: "lives", enPast: "lived", enPp: "lived", enGerund: "living" },
+	{spName: "Pagar",  enInf: "to pay",  enBase: "pay", en3ps: "pays", enPast: "paid", enPp: "paid"},
+	{spName: "Perder", enInf: "to lose",  enBase: "lose", en3ps: "loses", enPast: "lost", enPp: "lost", enGerund: "losing" },
+	{spName: "Ir", enInf: "to go",  enBase: "go", en3ps: "goes", enPast: "went", enPp: "gone", enGerund: "going" },
+	{spName: "Ser", enInf: "to be (description)",  enBase: "be", en3ps: "is", enPast: "was", enPp: "been", enGerund: "being"}, 
+	{spName: "Estar", enInf: "to be (location)",  enBase: "be", en3ps: "is", enPast: "was", enPp: "been", enGerund: "being"},
+	{spName: "Dar", enInf: "to give",  enBase: "give", en3ps: "gives", enPast: "gave", enPp: "given", enGerund: "giving" },
+	{spName: "Ver", enInf: "to see",  enBase: "see", en3ps: "sees", enPast: "saw", enPp: "seen", enGerund: "seeing" },
+	{spName: "Levantarse", enInf: "to get up",  enBase: "get up", en3ps: "gets up", enPast: "got up", enPp: "gotten up", enGerund: "getting up" },
+	{spName: "Conocer", enInf: "to know (a place)", enBase: "know (a place)", en3ps: "knows (a place)", enPast: "knew (a place)", enPp: "known (a place)", enGerund: "knowing (a place)" },
+	{spName: "Poder", enInf: "to be",  enBase: "be", en3ps: "is", enPast: "was", enPp: "been", enGerund: "being"},
+	{spName: "Traer", enInf: "to bring",  enBase: "bring", en3ps: "brings", enPast: "brought", enPp: "brought", enGerund: "bringing"},
+	{spName: "Poner", enInf: "to put",  enBase: "put", en3ps: "puts", enPast: "put", enPp: "put", enGerund: "putting"},
+	{spName: "Venir", enInf: "to come",  enBase: "come", en3ps: "comes", enPast: "came", enPp: "come", enGerund: "coming"},
+	{spName: "Hacer", enInf: "to make",  enBase: "make", en3ps: "makes", enPast: "made", enPp: "made", enGerund: "making"},
+	{spName: "Saber", enInf: "to know (how to)",  enBase: "know (how to)", en3ps: "knows (how to)", enPast: "found out", enPp: "known (how to)", enGerund: "knowing (how to)"},
+	{spName: "Querer", enInf: "to want",  enBase: "want", en3ps: "wants", enPast: "tried", enPp: "wanted", enGerund: "wanting"},
+	{spName: "Oir", enInf: "to hear",  enBase: "hear", en3ps: "hears", enPast: "heard", enPp: "heard", enGerund: "hearing"},
+	{spName: "Leer", enInf: "to read",  enBase: "read", en3ps: "reads", enPast: "read (past)", enPp: "read", enGerund: "reading"},
+	{spName: "Decir", enInf: "to say",  enBase: "say", en3ps: "says", enPast: "said", enPp: "said", enGerund: "saying"},
+	{spName: "Tener", enInf: "to have",  enBase: "have", en3ps: "has", enPast: "had", enPp: "had", enGerund: "having"},
+	{spName: "Dormir", enInf: "to sleep",  enBase: "sleep", en3ps: "sleeps", enPast: "slept", enPp: "slept", enGerund: "sleeping"},
+	{spName: "Cantar", enInf: "to sing",  enBase: "sing", en3ps: "sings", enPast: "sang", enPp: "sung", enGerund: "singing"},
+	{spName: "Jugar", enInf: "to play",  enBase: "play", en3ps: "plays", enPast: "played", enPp: "played", enGerund: "playing"},
+	{spName: "Buscar", enInf: "to look for",  enBase: "look for", en3ps: "looks for", enPast: "looked for", enPp: "looked for", enGerund: "looking for"},
+	{spName: "Recibir", enInf: "to receive",  enBase: "receive", en3ps: "receives", enPast: "received", enPp: "received", enGerund: "receiving"},
+	{spName: "Invitar", enInf: "to invite",  enBase: "invite", en3ps: "invites", enPast: "invited", enPp: "invited", enGerund: "inviting"},
+	{spName: "Terminar", enInf: "to finish",  enBase: "finish", en3ps: "finishes", enPast: "finished", enPp: "finished", enGerund: "finishing"},
+	{spName: "Preguntar", enInf: "to ask",  enBase: "ask", en3ps: "asks", enPast: "asked", enPp: "asked", enGerund: "asking"},
+	{spName: "Viajar", enInf: "to travel",  enBase: "travel", en3ps: "travels", enPast: "traveled", enPp: "traveled", enGerund: "traveling"},
+	{spName: "Gastar", enInf: "to waste",  enBase: "waste", en3ps: "wastes", enPast: "wasted", enPp: "wasted", enGerund: "wasting"},
+	{spName: "Estudiar", enInf: "to study",  enBase: "study", en3ps: "studies", enPast: "studied", enPp: "studied", enGerund: "studying"},
+	{spName: "Quitar", enInf: "to remove",  enBase: "remove", en3ps: "removes", enPast: "removed", enPp: "removed", enGerund: "removing"},
+	{spName: "Lavar", enInf: "to wash",  enBase: "wash", en3ps: "washes", enPast: "washed", enPp: "washed", enGerund: "washing"},
+	{spName: "Ayudar", enInf: "to help",  enBase: "help", en3ps: "helps", enPast: "helped", enPp: "helped", enGerund: "helping"},
+	{spName: "Regresar", enInf: "to return",  enBase: "return", en3ps: "returns", enPast: "returned", enPp: "returned", enGerund: "returning"},
+	{spName: "Bailar", enInf: "to dance",  enBase: "dance", en3ps: "dances", enPast: "danced", enPp: "danced", enGerund: "dancing"},
+	{spName: "Visitar", enInf: "to visit",  enBase: "visit", en3ps: "visits", enPast: "visited", enPp: "visited", enGerund: "visiting"},
+	{spName: "Usar", enInf: "to use",  enBase: "use", en3ps: "uses", enPast: "used", enPp: "used", enGerund: "using"},
+	{spName: "Esperar", enInf: "to wait (for)",  enBase: "wait (for)", en3ps: "waits (for)", enPast: "waited (for)", enPp: "waited (for)", enGerund: "waiting (for)"},
+	{spName: "Ordenar", enInf: "to order",  enBase: "order", en3ps: "orders", enPast: "ordered", enPp: "ordered", enGerund: "ordering"},
+	{spName: "Llevar", enInf: "to carry",  enBase: "carry", en3ps: "carries", enPast: "carried", enPp: "carried", enGerund: "carrying"},
+	{spName: "LLegar", enInf: "to arrive",  enBase: "arrive", en3ps: "arrives", enPast: "arrived", enPp: "arrived", enGerund: "arriving"},
+	{spName: "Platicar", enInf: "to chat",  enBase: "chat", en3ps: "chats", enPast: "chatted", enPp: "chatted", enGerund: "chatting"},
+	{spName: "Bajar", enInf: "to lower",  enBase: "lower", en3ps: "lowers", enPast: "lowered", enPp: "lowered", enGerund: "lowering"},
+	{spName: "Pasar", enInf: "to happen",  enBase: "happen", en3ps: "happens", enPast: "happened", enPp: "happened", enGerund: "happening"},
+	{spName: "Mandar", enInf: "to send",  enBase: "send", en3ps: "sends", enPast: "sent", enPp: "sent", enGerund: "sending"},
+	{spName: "Contestar", enInf: "to answer",  enBase: "answer", en3ps: "answers", enPast: "answered", enPp: "answered", enGerund: "answering"},
+	{spName: "Cambiar", enInf: "to change",  enBase: "change", en3ps: "changes", enPast: "changed", enPp: "changed", enGerund: "changing"},
+	{spName: "Probar", enInf: "to test",  enBase: "test", en3ps: "tests", enPast: "tested", enPp: "tested", enGerund: "testing"},
+	{spName: "Pensar", enInf: "to think (about) ",  enBase: "think (about)", en3ps: "thinks (about)", enPast: "thought (about)", enPp: "thought (about)", enGerund: "thinking (about)"},
+	{spName: "Eschuchar", enInf: "to listen to",  enBase: "listen to", en3ps: "listens to", enPast: "listened to", enPp: "listened to", enGerund: "listening"},
+	{spName: "Presentar", enInf: "to introduce",  enBase: "introduce", en3ps: "introduces", enPast: "introduced", enPp: "introduced", enGerund: "introducing"},
+	{spName: "Empezar", enInf: "to start",  enBase: "start", en3ps: "starts", enPast: "started", enPp: "started", enGerund: "starting"},
+	{spName: "Limpiar", enInf: "to clean",  enBase: "clean", en3ps: "cleans", enPast: "cleaned", enPp: "cleaned", enGerund: "cleaning"},
+	{spName: "Firmar", enInf: "to sign",  enBase: "sign", en3ps: "signs", enPast: "signed", enPp: "signed", enGerund: "signing"},
+	{spName: "Caminar", enInf: "to walk",  enBase: "walk", en3ps: "walks", enPast: "walked", enPp: "walked", enGerund: "walking"},
+	{spName: "Descansar", enInf: "to rest",  enBase: "rest", en3ps: "rests", enPast: "rested", enPp: "rested", enGerund: "resting"},
+	{spName: "Necesitar", enInf: "to need",  enBase: "need", en3ps: "needs", enPast: "needed", enPp: "needed", enGerund: "needing"},
+	{spName: "Manejar", enInf: "to drive",  enBase: "drive", en3ps: "drives", enPast: "drove", enPp: "driven", enGerund: "driving"},
+	{spName: "Sacar", enInf: "to take out",  enBase: "take out", en3ps: "takes out", enPast: "took out", enPp: "taken out", enGerund: "taking out"},
+	{spName: "Olvidar", enInf: "to forget",  enBase: "forget", en3ps: "forgets", enPast: "forgot", enPp: "forgotten", enGerund: "forgetting"},
+	{spName: "Preparar", enInf: "to prepare",  enBase: "prepare", en3ps: "prepares", enPast: "prepared", enPp: "prepared", enGerund: "preparing"},
+	{spName: "Comprar", enInf: "to buy",  enBase: "buy", en3ps: "buys", enPast: "bought", enPp: "bought", enGerund: "buying"},
+	{spName: "Cocinar", enInf: "to cook",  enBase: "cook", en3ps: "cooks", enPast: "cooked", enPp: "cooked", enGerund: "cooking"},
+	{spName: "Ganar", enInf: "to earn",  enBase: "earn", en3ps: "earns", enPast: "earned", enPp: "earned", enGerund: "earning"},
+	{spName: "Recordar", enInf: "to remember",  enBase: "remember", en3ps: "remembers", enPast: "remembered", enPp: "remembered", enGerund: "remembering"},
+	{spName: "Tocar", enInf: "to toucn",  enBase: "touch", en3ps: "touches", enPast: "touched", enPp: "touched", enGerund: "touching"},
+	{spName: "Trabajar", enInf: "to work",  enBase: "work", en3ps: "works", enPast: "worked", enPp: "worked", enGerund: "working"},
+	{spName: "Recomendar", enInf: "to recommend",  enBase: "recommend", en3ps: "recommends", enPast: "recommended", enPp: "recommended", enGerund: "recommending"},
+	{spName: "Arreglar", enInf: "to arrange",  enBase: "arrange", en3ps: "arranges", enPast: "arranged", enPp: "arranged", enGerund: "arranging"},
+	{spName: "Encontrar", enInf: "to find",  enBase: "find", en3ps: "finds", enPast: "found", enPp: "found", enGerund: "finding"},
+	{spName: "Dejar", enInf: "to leave behind",  enBase: "leave behind", en3ps: "leaves behind", enPast: "left behind", enPp: "left behind", enGerund: "leaving behind"},
+	{spName: "Tratar", enInf: "to try (to)",  enBase: "try (to)", en3ps: "tries (to)", enPast: "tried (to)", enPp: "tried (to)", enGerund: "trying (to)"},
+	{spName: "Llenar", enInf: "to fill",  enBase: "fill", en3ps: "fills", enPast: "filled", enPp: "filled", enGerund: "filling"},	
+	{spName: "Abrir", enInf: "to open",  enBase: "open", en3ps: "opens", enPast: "opened", enPp: "opened", enGerund: "opening"},
+	{spName: "Aprender", enInf: "to learn",  enBase: "learn", en3ps: "learns", enPast: "learned", enPp: "learned", enGerund: "learning"},
+	{spName: "Conseguir", enInf: "to get",  enBase: "get", en3ps: "gets", enPast: "got", enPp: "gotten", enGerund: "geting"},
+	{spName: "Correr", enInf: "to run",  enBase: "run", en3ps: "runs", enPast: "ran", enPp: "run", enGerund: "running"},
+	{spName: "Creer", enInf: "to believe",  enBase: "believe", en3ps: "believes", enPast: "believed", enPp: "believed", enGerund: "believing"},		
+	{spName: "Decidir", enInf: "to decide",  enBase: "decide", en3ps: "decides", enPast: "decided", enPp: "decided", enGerund: "deciding"},
+	{spName: "Entender", enInf: "to understand",  enBase: "understand", en3ps: "understands", enPast: "understood", enPp: "understood", enGerund: "understanding"},
+	{spName: "Escribir", enInf: "to write",  enBase: "write", en3ps: "writes", enPast: "wrote", enPp: "written", enGerund: "writing"},
+	{spName: "Mover", enInf: "to move ",  enBase: "move", en3ps: "moves", enPast: "moved", enPp: "moved", enGerund: "moving"},
+	{spName: "Pedir", enInf: "to ask for",  enBase: "ask for", en3ps: "asks for", enPast: "asked for", enPp: "asked for", enGerund: "asking for"},		
+	{spName: "Salir", enInf: "to leave",  enBase: "leave", en3ps: "leaves", enPast: "left", enPp: "left", enGerund: "leaving"},
+	{spName: "Seguir", enInf: "to follow",  enBase: "follow", en3ps: "follows", enPast: "followed", enPp: "followed", enGerund: "following"},
+	{spName: "Subir", enInf: "to raise",  enBase: "raise", en3ps: "raises", enPast: "raised", enPp: "raised", enGerund: "raising"},
+	{spName: "Vender", enInf: "to sell",  enBase: "sell", en3ps: "sells", enPast: "sold", enPp: "sold", enGerund: "selling"},
+	{spName: "Vivir", enInf: "to live",  enBase: "live", en3ps: "lives", enPast: "liveed", enPp: "liveed", enGerund: "living"},
+	{spName: "Ba&ntilde;arse", enInf: "to bathe onself",  enBase: "bathe", en3ps: "bathes", enPast: "bathed", enPp: "bathed", enGerund: "bathing"},
+	{spName: "Acostarse", enInf: "to lie down",  enBase: "lie down", en3ps: "lies down", enPast: "lay down", enPp: "lain down", enGerund: "laying down"},
+	{spName: "Enfermarse", enInf: "to get sick",  enBase: "get sick down", en3ps: "gets sick", enPast: "got sick", enPp: "got sick", enGerund: "getting sick"},
+	{spName: "Sentarse", enInf: "to sit down",  enBase: "sit down", en3ps: "sits down", enPast: "sat down", enPp: "sat down", enGerund: "sitting down"},
+	{spName: "Caerse", enInf: "to fall down",  enBase: "fall down", en3ps: "falls down", enPast: "fell down", enPp: "fallen down", enGerund: "falling down"},
+	{spName: "Divertirse", enInf: "to have fun",  enBase: "have fun", en3ps: "has fun", enPast: "had fun", enPp: "had fun", enGerund: "having fun"},
+	{spName: "Mudarse", enInf: "to move (household)",  enBase: "move", en3ps: "moves", enPast: "moved", enPp: "moved", enGerund: "moving"}
+
+];
+
+
+// *********************************************************************************
+//
+//
+//
+//
+// *********************************************************************************
+
+
+// Global current verb. If string length == 0, then all verbs
+var gblSubset = "";
+var gblVerb = "";
+var gblTense = "";
+var gblPerson = "";
+var gblTimer = 0;
+var gblTranslationDirection = 1;
+var gblInfinitiveOnly = 0;
+var gblPresentation = 1;
+const cEnglishToSpanish = 1;
+const cSpanishToEnglish = 2;
+const cRandom = 1;
+const cRolodex = 2;
+
+const cCookieName = "reviewlist";
+
+const gblReviewAdd ="Add to Review list?";
+const gblReviewRemove ="Remove from Review list?";
+
+
+
+var gblVerbSaved = -1;
+var gblTenseSaved = -1;
+var gblPersonSaved = -1;
+
+var gblTmpVerbs = [] ;
+
+
+// *********************************************************************************
+//
+//
+//
+//
+// *********************************************************************************
+
+
+
+function initControls() {
+
+
+	// Initialize verb dropdown control
+	const ary = [];
+	gblTmpVerbs = [];
+  
+	spVerbs.map(el => ary.push(el.spName));
+	ary.sort();
+	 
+	var select = document.getElementById("ddVerbs");
+	ary.forEach(verb => {
+			gblTmpVerbs.push(verb);  //Make an inital coopy of verb array into a temporary array (gblTmpVerbs)
+  		const option = document.createElement("option");
+  		option.value = verb;
+  		option.text = decodeHTMLEntities(verb);
+  		select.add(option);
+	}); 
+	
+	// Initialize tenses dropdown control
+	var intTense = 0;
+	select = document.getElementById("ddTenses");
+	tenses.forEach(tense => {  		
+		option = document.createElement("option");
+  		option.value = intTense++;
+  		option.text = tense.name;
+  		select.add(option);
+	}); 
+	
+	
+	// Initialize persons dropdown control
+	var intPerson = 0;
+	select = document.getElementById("ddPersons");
+	persons.forEach(person => {  		
+		option = document.createElement("option");
+  		option.value = intPerson++;
+  		option.text = decodeHTMLEntities(person.spName);
+  		select.add(option);
+	}); 
+	
+
+	// Set review flags in any saved verbs in cookies
+	load_saved_review_flags() ;
+
+	
+	return;
+}
+
+
+// **************************************************************************
+//
+// Cookie Function Section
+//
+// **************************************************************************
+
+function setCookie(cname,cvalue,exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires=" + d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+
+function del_cookie(name, exp) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+} 
+
+function displayCookie() {
+  let exdays = 10;	
+  const d = new Date();
+  d.setTime(d.getTime() - (exdays*24*60*60*1000));
+
+
+  del_cookie("username", d.toUTCString());
+  setCookie("username", "[]", 10);
+  let user = getCookie("username");
+  let div = document.querySelector('#test');
+  div.innerHTML = d.toUTCString() + '<p>' + getCookie("username") + '<p>' + decodeURIComponent(document.cookie);
+}
+
+
+function load_saved_review_flags() {
+	
+	let str = getCookie(cCookieName);  //Get the cookie with saved values
+	let ary = str.split(",");
+	var idx = 0;
+
+	if (ary.length > 0) {
+		for (var i = 0; i < ary.length; i++) {
+			idx = parseInt(ary[i]);
+			spVerbs[idx].review = true;
+		}
+	} 
+
+	return;
+
+}
+
+
+// **************************************************************************
+//
+// End Cookie Function Section
+//
+// **************************************************************************
+
+
+
+function decodeHTMLEntities(text) {
+  let textArea = document.createElement('textarea');
+  textArea.innerHTML = text;
+  return textArea.value;
+}
+
+
+function fnGetNextVerb() {
+
+	var obj;
+
+	if (gblPresentation == cRandom) {
+		obj = fnGetRandomizedValues();
+	} else {
+		obj = fnGetNextRolodexVerb();
+	}
+
+	return { "verb": obj.verb, "tense": obj.tense, "person": obj.person };
+
+
+}
+
+function fnGetNextRolodexVerb() {
+	// This function is called when the "Rolodex" presentation option is selected.
+	// It uses the saved values and returns the next verb in the given verb, tense, person sequence.
+
+
+  var idxTmp = 0;
+  var strVerb = "";
+
+  var person = 0;
+  var tense = 0;
+
+  // Just in case this is the first time
+	 
+  	if	(gblVerbSaved < 0) { gblVerbSaved = 0 };
+  	if	(gblTenseSaved < 0) { gblTenseSaved = 0 };
+  	if	(gblPersonSaved < 0) { gblPersonSaved = 0 };
+	
+
+
+  // Get the index of the verb in the sorted array of verbs
+  idxTmp = gblTmpVerbs.indexOf(spVerbs[gblVerbSaved].spName);
+
+  let verb = gblVerbSaved;
+  // let verb = get_verb_info(gblTmpVerbs[idx]); 
+  
+	if (gblTense.length > 0) {
+		tense = parseInt(gblTense);
+	} else {
+		tense = gblTenseSaved;
+	}
+	
+	if (gblPerson.length > 0) {
+		person = parseInt(gblPerson);
+	} else {
+		person = gblPersonSaved;
+	}
+
+
+	if (gblPerson.length > 0) {  // We want to Rolodex with a fixed person value (e.g., 1st person)
+		
+		if (gblTense.length > 0) { // The user has selected a fixed tense as well (e.g., present)
+			idxTmp++;
+			if (idxTmp >= gblTmpVerbs.length) {
+				idxTmp = 0;
+			}
+			verb = spVerbs.findIndex(v => v.spName == gblTmpVerbs[idxTmp]);
+		} else {  // The user wants to Rolodex through the tenses with a fixed value for the "person"
+			tense++;
+			if (tense >= tenses.length) {
+				tense = 0;
+				idxTmp++;
+				if (idxTmp >= gblTmpVerbs.length) {
+					idxTmp = 0;
+				}
+				verb = spVerbs.findIndex(v => v.spName == gblTmpVerbs[idxTmp])
+			}	
+		}	
+
+	} else if (gblTense.length > 0) {  // The user has selected a fixed tense (e.g., present) wants to Rolodex through 
+
+	  person++;
+ 		if (person == 3 || person == 4) {person = 5};
+ 		if (person == 7 || person == 8 ) {person = 99};
+ 		if (person >= persons.length) { 
+ 		 	person = 0;
+ 			idxTmp++;
+			if (idxTmp >= gblTmpVerbs.length) {
+				idxTmp = 0;
+			}
+
+			verb = spVerbs.findIndex(v => v.spName == gblTmpVerbs[idxTmp]);
+	 	}
+	
+	} else {   // Rolodex through the entire verb
+
+  	person++;
+  	if (person == 3 || person == 4) {person = 5};
+  	if (person == 7 || person == 8 ) {person = 99};
+  	if (person >= persons.length) { 
+  		person = 0;
+  		tense++;
+			if (tense >= tenses.length) {
+				tense = 0;
+				idxTmp++;
+				if (idxTmp >= gblTmpVerbs.length) {
+					idxTmp = 0;
+				}
+				verb = spVerbs.findIndex(v => v.spName == gblTmpVerbs[idxTmp])
+			}
+  	}
+	}
+
+	// Save our values
+	gblVerbSaved = verb;
+	gblTenseSaved = tense;
+	gblPersonSaved = person;
+	
+	
+	return {"verb": parseInt(verb), "tense": parseInt(tense), "person": parseInt(person) };
+	
+}
+
+
+function fnGetRandomizedValues() {
+	// Randomize Verb, Tense, and Person
+	//let verb = Math.floor(Math.random() * spVerbs.length);
+	
+  // Get the verb from the global temporary list of verbs, which may be a subset
+	let idx = Math.floor(Math.random() * gblTmpVerbs.length);
+
+	// Now get the index (verb) from the master verb list "spVerbs"
+  let verb = get_verb_info(gblTmpVerbs[idx]); 
+
+	let tense = Math.floor(Math.random() * tenses.length);
+	let person = Math.floor(Math.random() * persons.length); 
+		
+	// We don't want to repeat values, so we'll change the tense
+	if (verb == gblVerbSaved && tense == gblTenseSaved && person == gblPersonSaved) {
+		tense++;
+		if (tense >= cTenseCount) {
+			tense = 0;
+		}
+	}
+	
+	// Save our values
+	gblVerbSaved = verb;
+	gblTenseSaved = tense;
+	gblPersonSaved = person;
+	
+	
+	return {"verb": parseInt(verb), "tense": parseInt(tense), "person": parseInt(person) };
+			
+}
+
+
+function fnGetConjugatedVerb(verb, tense, person) {
+	
+	var conjugatedVerb = "";
+	var isSpecial = false; 
+	let strVerb = spVerbs[verb].spName;
+	let intPerson = persons[person].person;
+	let strPerson = persons[person].spName;
+
+	if (spVerbs[verb].special == '0') {
+		isSpecial = false;
+	} else {
+		isSpecial = true;
+	}
+
+	//let strType = spVerbs[verb].type;
+	var verbGerund = "";
+	var verbParticiple = "";
+	var isReflexive = false;
+	var strReflexivePronoun = "";
+	var verbEnding = "";
+	var verbStem = "";
+	var verbNstrsStem = "";
+	var verb1stPersonPresent = "";
+	var verb1stPersonPast = "";
+	var verb3rdPersonPastStem = "";
+	var verbFutCondStem = "";
+	
+	verbEnding = strVerb.substring(strVerb.length-2).toUpperCase();
+	if (verbEnding == "SE") {
+		isReflexive = true;
+		strReflexivePronoun = persons[person].reflexive;
+		strVerb = strVerb.substring(0, strVerb.length-2); //Chop off the "SE"
+	}
+	
+	verbEnding = strVerb.substring(strVerb.length-2).toUpperCase();
+	verbStem = strVerb.substring(0,strVerb.length-2);
+	verbNstrStem = verbStem ;
+ 
+	if (verbEnding == "AR") {
+		if (isReflexive) { 
+			verbGerund = verbStem + "&aacute;ndo";
+		} else { 
+			verbGerund = verbStem + "ando";
+		}
+		verbParticiple = verbStem + "ado";
+	} else {
+		if (isReflexive) { 
+			verbGerund = verbStem + "i&eacute;ndo";
+		} else { 
+			verbGerund = verbStem + "iendo";
+		}
+		verbParticiple = verbStem + "ido";
+	}
+	
+	/***************************************************
+		Handle some exceptions to standard conjugations 
+	****************************************************/
+	if ( !(spVerbs[verb].spGerund === undefined) && tense === cPresent_Progressive) {
+		verbGerund = spVerbs[verb].spGerund;
+	}
+	
+	if ( !(spVerbs[verb].sp1pStem === undefined) && tense === cPresent) {
+		verbStem = spVerbs[verb].sp1pStem ;
+	}
+	
+	if ( !(spVerbs[verb].sp1pPres === undefined) && tense === cPresent) {
+		verb1stPersonPresent = spVerbs[verb].sp1pPres;
+	}
+	
+	if ( !(spVerbs[verb].sp1pPret === undefined) && tense === cPast) {
+		verb1stPersonPast = spVerbs[verb].sp1pPret;
+	}
+	
+	if ( !(spVerbs[verb].spFutCondStem === undefined) && (tense === cFuture || tense === cConditional)) {
+		verbFutCondStem = spVerbs[verb].spFutCondStem;
+	}
+
+	if ( !(spVerbs[verb].sp3pPretStem === undefined) && tense === cPast) {
+		verb3rdPersonPastStem = spVerbs[verb].sp3pPretStem;
+	}
+
+
+	if (!isSpecial) {
+		switch (true) {
+			// *************** PRESENT TENSE ENDINGS **************
+			// Present "Yo" 
+			case ((tense == cPresent) && (intPerson == cYo) && (verbEnding == "AR")):
+				if (verb1stPersonPresent.length > 0) { 
+					conjugatedVerb = verb1stPersonPresent;
+				} else {
+					conjugatedVerb = verbStem + "o";
+				}
+				break;
+			case ((tense == cPresent) && (intPerson == cYo) && (verbEnding == "ER")):
+				if (verb1stPersonPresent.length > 0) {
+					conjugatedVerb = verb1stPersonPresent;
+				} else {
+					conjugatedVerb = verbStem + "o";
+				}
+				break;
+			case ((tense == cPresent) && (intPerson == cYo) && (verbEnding == "IR")):
+				if (verb1stPersonPresent.length > 0) {
+					conjugatedVerb = verb1stPersonPresent;
+				} else {
+					conjugatedVerb = verbStem + "o";
+				}
+				break;
+			
+				
+			// Present "Tú"
+			case ((tense == cPresent) && (intPerson == cTu) && (verbEnding == "AR")):
+				conjugatedVerb = verbStem + "as";
+				break;
+			case ((tense == cPresent) && (intPerson == cTu) && (verbEnding == "ER")):
+				conjugatedVerb = verbStem + "es";
+				break;
+			case ((tense == cPresent) && (intPerson == cTu) && (verbEnding == "IR")):
+				conjugatedVerb = verbStem + "es";
+				break;
+			
+			// Present "Él," "Ella", "Ud."
+			case ((tense == cPresent) && (intPerson == cEl) && (verbEnding == "AR")):
+				conjugatedVerb = verbStem + "a"; 
+				break;
+			case ((tense == cPresent) && (intPerson == cEl) && (verbEnding == "ER")):
+				conjugatedVerb = verbStem + "e";
+				break;
+			case ((tense == cPresent) && (intPerson == cEl) && (verbEnding == "IR")):
+				conjugatedVerb = verbStem + "e";
+				break;
+
+			// Present "Nosotros"
+			case ((tense == cPresent) && (intPerson == cNosotros) && (verbEnding == "AR")):
+				conjugatedVerb = verbNstrStem + "amos";
+				break;
+			case ((tense == cPresent) && (intPerson == cNosotros) && (verbEnding == "ER")):
+				conjugatedVerb = verbNstrStem + "emos";
+				break;
+			case ((tense == cPresent) && (intPerson == cNosotros) && (verbEnding == "IR")):
+				conjugatedVerb = verbNstrStem + "imos";
+				break;
+
+			// Present "Ellos", "Ellas", "Uds."
+			case ((tense == cPresent) && (intPerson == cEllos) && (verbEnding == "AR")):
+				conjugatedVerb = verbStem + "an";
+				break;
+			case ((tense == cPresent) && (intPerson == cEllos) && (verbEnding == "ER")):
+				conjugatedVerb = verbStem + "en";
+				break;
+			case ((tense == cPresent) && (intPerson == cEllos) && (verbEnding == "IR")):
+				conjugatedVerb = verbStem + "en";
+				break;
+				
+			// *************** IMPERFECT TENSE ENDINGS **************
+			// Imperfect "Yo" 
+			case ((tense == cImperfect) && (intPerson == cYo) && (verbEnding == "AR")):
+				conjugatedVerb = verbStem + "aba";
+				break;
+			case ((tense == cImperfect) && (intPerson == cYo) && (verbEnding == "ER")):
+				conjugatedVerb = verbStem + "&iacute;a";
+				break;
+			case ((tense == cImperfect) && (intPerson == cYo) && (verbEnding == "IR")):
+				conjugatedVerb = verbStem + "&iacute;a";
+				break;
+				
+			// Imperfect "Tú"
+			case ((tense == cImperfect) && (intPerson == cTu) && (verbEnding == "AR")):
+				conjugatedVerb = verbStem + "abas";
+				break;
+			case ((tense == cImperfect) && (intPerson == cTu) && (verbEnding == "ER")):
+				conjugatedVerb = verbStem + "&iacute;as";
+				break;
+			case ((tense == cImperfect) && (intPerson == cTu) && (verbEnding == "IR")):
+				conjugatedVerb = verbStem + "&iacute;as";
+				break;
+			
+			// Imperfect "Él," "Ella", "Ud."
+			case ((tense == cImperfect) && (intPerson == cEl) && (verbEnding == "AR")):
+				conjugatedVerb = verbStem + "aba"; 
+				break;
+			case ((tense == cImperfect) && (intPerson == cEl) && (verbEnding == "ER")):
+				conjugatedVerb = verbStem + "&iacute;a";
+				break;
+			case ((tense == cImperfect) && (intPerson == cEl) && (verbEnding == "IR")):
+				conjugatedVerb = verbStem + "&iacute;a";
+				break;
+
+			// Imperfect "Nosotros"
+			case ((tense == cImperfect) && (intPerson == cNosotros) && (verbEnding == "AR")):
+				conjugatedVerb = verbNstrStem + "&aacute;bamos";
+				break;
+			case ((tense == cImperfect) && (intPerson == cNosotros) && (verbEnding == "ER")):
+				conjugatedVerb = verbNstrStem + "&iacute;amos";
+				break;
+			case ((tense == cImperfect) && (intPerson == cNosotros) && (verbEnding == "IR")):
+				conjugatedVerb = verbNstrStem + "&iacute;amos";
+				break;
+
+			// Imperfect "Ellos", "Ellas", "Uds."
+			case ((tense == cImperfect) && (intPerson == cEllos) && (verbEnding == "AR")):
+				conjugatedVerb = verbStem + "aban";
+				break;
+			case ((tense == cImperfect) && (intPerson == cEllos) && (verbEnding == "ER")):
+				conjugatedVerb = verbStem + "&iacute;an";
+				break;
+			case ((tense == cImperfect) && (intPerson == cEllos) && (verbEnding == "IR")):
+				conjugatedVerb = verbStem + "&iacute;an";
+				break;
+				
+			// *************** PAST TENSE ENDINGS **************
+			// Past "Yo" 
+			case ((tense == cPast) && (intPerson == cYo) && (verbEnding == "AR")):
+				if ( verb1stPersonPast.length > 0) {
+					conjugatedVerb = verb1stPersonPast; 
+				} else {
+					conjugatedVerb = verbStem + "&eacute;";
+				}
+				break;
+			case ((tense == cPast) && (intPerson == cYo) && (verbEnding == "ER")):
+				if ( verb1stPersonPast.length > 0) {
+					conjugatedVerb = verb1stPersonPast; 
+				} else {
+					conjugatedVerb = verbStem + "&iacute;";
+				}
+				break;
+			case ((tense == cPast) && (intPerson == cYo) && (verbEnding == "IR")):
+				if ( verb1stPersonPast.length > 0) {
+					conjugatedVerb = verb1stPersonPast; 
+				} else {
+					conjugatedVerb = verbStem + "&iacute;";
+				}
+				break;
+				
+			// Past "Tú"
+			case ((tense == cPast) && (intPerson == cTu) && (verbEnding == "AR")):
+				conjugatedVerb = verbStem + "aste";
+				break;
+			case ((tense == cPast) && (intPerson == cTu) && (verbEnding == "ER")):
+				conjugatedVerb = verbStem + "iste";
+				break;
+			case ((tense == cPast) && (intPerson == cTu) && (verbEnding == "IR")):
+				conjugatedVerb = verbStem + "iste";
+				break;
+			
+			// Past "Él," "Ella", "Ud."
+			case ((tense == cPast) && (intPerson == cEl) && (verbEnding == "AR")):
+				if ( verb3rdPersonPastStem.length > 0) {
+					conjugatedVerb = verb3rdPersonPastStem + "&oacute;"; 
+				} else {
+					conjugatedVerb = verbStem + "&oacute;";
+				}	
+				break;
+			case ((tense == cPast) && (intPerson == cEl) && (verbEnding == "ER")):
+				if ( verb3rdPersonPastStem.length > 0) {
+					conjugatedVerb = verb3rdPersonPastStem + "i&oacute;"; 
+				} else {
+					conjugatedVerb = verbStem + "i&oacute;";
+				}	
+				break;
+			case ((tense == cPast) && (intPerson == cEl) && (verbEnding == "IR")):
+				if ( verb3rdPersonPastStem.length > 0) {
+					conjugatedVerb = verb3rdPersonPastStem + "i&oacute;"; 
+				} else {
+					conjugatedVerb = verbStem + "i&oacute;";
+				}	
+				break;
+
+			// Past "Nosotros"
+			case ((tense == cPast) && (intPerson == cNosotros) && (verbEnding == "AR")):
+				conjugatedVerb = verbNstrStem + "amos";
+				break;
+			case ((tense == cPast) && (intPerson == cNosotros) && (verbEnding == "ER")):
+				conjugatedVerb = verbNstrStem + "imos";
+				break;
+			case ((tense == cPast) && (intPerson == cNosotros) && (verbEnding == "IR")):
+				conjugatedVerb = verbNstrStem + "imos";
+				break;
+
+			// Past "Ellos", "Ellas", "Uds."
+			case ((tense == cPast) && (intPerson == cEllos) && (verbEnding == "AR")):
+				if ( verb3rdPersonPastStem.length > 0) {
+					conjugatedVerb = verb3rdPersonPastStem + "aron"; 
+				} else {
+					conjugatedVerb = verbStem + "aron";
+				}	
+				break;
+			case ((tense == cPast) && (intPerson == cEllos) && (verbEnding == "ER")):
+				if ( verb3rdPersonPastStem.length > 0) {
+					conjugatedVerb = verb3rdPersonPastStem + "ieron"; 
+				} else {
+					conjugatedVerb = verbStem + "ieron";
+				}	
+				break;
+			case ((tense == cPast) && (intPerson == cEllos) && (verbEnding == "IR")):
+				if ( verb3rdPersonPastStem.length > 0) {
+					conjugatedVerb = verb3rdPersonPastStem + "ieron"; 
+				} else {
+					conjugatedVerb = verbStem + "ieron";
+				}	
+				break;
+				
+			// *************** FUTURE TENSE ENDINGS **************
+			// Future "Yo", "Tú", "Él", "Ella", "Ud.", "Nosotros", "Ellos", "Ellas", "Uds."
+			case ((tense == cFuture) && (intPerson == cYo)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "&eacute;";	
+				} else {
+					conjugatedVerb = strVerb + "&eacute;";
+				}
+				break;
+			case ((tense == cFuture) && (intPerson == cTu)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "&aacute;s";	
+				} else {
+					conjugatedVerb = strVerb + "&aacute;s";
+				}
+				break;
+			case ((tense == cFuture) && (intPerson == cEl)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "&aacute;";	
+				} else {
+					conjugatedVerb = strVerb + "&aacute;";
+				}
+				break;
+			case ((tense == cFuture) && (intPerson == cNosotros)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "emos";	
+				} else {
+					conjugatedVerb = strVerb + "emos";
+				}
+				break;
+			case ((tense == cFuture) && (intPerson == cEllos)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "&aacute;n";	
+				} else {
+					conjugatedVerb = strVerb + "&aacute;n";
+				}
+				break;
+				
+				
+			// *************** CONDITIONAL TENSE ENDINGS **************
+			// Conditional "Yo", "Tú", "Él", "Ella", "Ud.", "Nosotros", "Ellos", "Ellas", "Uds."
+			case ((tense == cConditional) && (intPerson == cYo)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "&iacute;a";	
+				} else {
+					conjugatedVerb = strVerb + "&iacute;a";
+				}
+				break;
+			case ((tense == cConditional) && (intPerson == cTu)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "&iacute;as";	
+				} else {
+					conjugatedVerb = strVerb + "&iacute;as";
+				}
+				break;
+			case ((tense == cConditional) && (intPerson == cEl)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "&iacute;a";	
+				} else {
+					conjugatedVerb = strVerb + "&iacute;a";
+				}
+				break;
+			case ((tense == cConditional) && (intPerson == cNosotros)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "&iacute;amos";	
+				} else {
+					conjugatedVerb = strVerb + "&iacute;amos";
+				}
+				conjugatedVerb = strVerb + "&iacute;amos";
+				break;
+			case ((tense == cConditional) && (intPerson == cEllos)):
+				if ( verbFutCondStem.length > 0) {
+					conjugatedVerb = verbFutCondStem + "&iacute;an";	
+				} else {
+					conjugatedVerb = strVerb + "&iacute;an";
+				}
+				break; 
+		}  // End Switch
+	
+	} else { 	/*************************************************************
+							Not a "normal" verb, therefore "special" handling
+						**************************************************************/
+	
+		let idxValue = -1;
+		/******************************************
+		We find the index in the "aryIrregs" array
+		by looking up the spName 
+		*******************************************/
+		idxValue = aryIrregs.findIndex(verb => verb.name == strVerb); 
+		if (idxValue == -1) { 
+			return( strVerb + " not found in irregular verbs array" );
+		} else { 
+			verb = idxValue;
+			/**********************************************
+			Also we limit the tenses to 5 (0,1,2,3,4) because 
+			"Present Progressive" and "Present Perfect" 
+			are handled differently below.
+			***********************************************/
+			if (tense <= 4) {
+				conjugatedVerb = aryIrregs[idxValue].tenses[tense][intPerson];
+			} else {
+				verbGerund = aryIrregs[idxValue].gerund;
+				verbParticiple = aryIrregs[idxValue].participle;
+			}
+		} 
+	
+	}
+	
+	if (tense == cPresent_Progressive || tense == cPresent_Perfect) {
+
+		switch (true) {
+			// **************** PRESENT PROGRESSIVE ENDINGS **********
+			// Present Progressive
+			// Note: reflexive pronouns are appended to the gerund ending
+			case (tense == cPresent_Progressive && intPerson == cYo):
+				conjugatedVerb = "Estoy " + verbGerund + strReflexivePronoun;
+				break;
+			case (tense == cPresent_Progressive && intPerson == cTu):
+				conjugatedVerb = "Est&aacute;s " + verbGerund + strReflexivePronoun;
+				break;
+			case (tense == cPresent_Progressive && intPerson == cEl):
+				conjugatedVerb = "Est&aacute; " + verbGerund + strReflexivePronoun;
+				break;
+			case (tense == cPresent_Progressive && intPerson == cNosotros):
+				conjugatedVerb = "Estamos " + verbGerund + strReflexivePronoun;
+				break;
+			case (tense == cPresent_Progressive && intPerson == cEllos):
+				conjugatedVerb = "Est&aacute;n " + verbGerund + strReflexivePronoun;
+				break;
+
+			// **************** PRESENT PREFECT ENDINGS **********
+			// Present Perfect
+			case (tense == cPresent_Perfect && intPerson == cYo):
+				conjugatedVerb = "He " + verbParticiple;
+				break;
+			case (tense == cPresent_Perfect && intPerson == cTu):
+				conjugatedVerb = "Has " + verbParticiple;
+				break;
+			case (tense == cPresent_Perfect && intPerson == cEl):
+				conjugatedVerb = "Ha " + verbParticiple;
+				break;
+			case (tense == cPresent_Perfect && intPerson == cNosotros):
+				conjugatedVerb = "Hemos " + verbParticiple;
+				break;
+			case (tense == cPresent_Perfect && intPerson == cEllos):
+				conjugatedVerb = "Han " + verbParticiple;
+				break;
+
+		} //End Switch
+	}  // End If Present_Progressive or Present Perfect
+	
+
+		if (isReflexive) {
+			if (tense == cPresent_Progressive) { 
+				if (intPerson == cEl || intPerson == cEllos) {
+					conjugatedVerb = strPerson + " " + conjugatedVerb;
+				} else if (intPerson == cYo && (tense == cImperfect || tense == cConditional)) {
+					conjugatedVerb = strPerson + " " + conjugatedVerb;
+				} else {
+					conjugatedVerb = conjugatedVerb;
+				}	
+			} else {
+				if (intPerson == cEl || intPerson == cEllos) {
+					conjugatedVerb = strPerson + " " + strReflexivePronoun + " " + conjugatedVerb;
+				} else if (intPerson == cYo && (tense == cImperfect || tense == cConditional)) {
+					conjugatedVerb = strPerson + " " + strReflexivePronoun + " " + conjugatedVerb;
+				} else {
+					conjugatedVerb = strReflexivePronoun + " " + conjugatedVerb;
+				}	
+			}
+		} else {
+			if (intPerson == cEl || intPerson == cEllos) {
+				conjugatedVerb = strPerson + " " + conjugatedVerb;
+			} else if (intPerson == cYo && (tense == cImperfect || tense == cConditional)) {
+				conjugatedVerb = strPerson + " " + conjugatedVerb;
+			}
+		}
+	
+	   
+		return (firstUpper(conjugatedVerb));
+		
+} // End function
+
+
+
+/*
+
+*/
+
+function fnGetEnglishPhrase(spVerb, tense, person)  {
+	let strEnglish = "Not Found";
+	let idxValue = -1;
+	let verb = -1;
+	
+	/******************************************
+	We find the index in the "enTrans" array
+	by looking up the spName from the the Spanish 
+	verb pointed to by the index "spVerb"
+	*******************************************/
+	let strVerb = spVerbs[spVerb].spName;
+	idxValue = enTrans.findIndex(verb => verb.spName == strVerb); 
+	if (idxValue == -1) { 
+		return( strVerb + " not found in English translation array" );
+	} else { 
+		verb = idxValue;
+	} 
+	
+	let strInf = enTrans[verb].enInf;
+	let strBase = enTrans[verb].enBase;
+	let strEn3ps = enTrans[verb].en3ps;
+	let strPast = enTrans[verb].enPast;
+	let strEnPp = enTrans[verb].enPp;
+	let strGerund = "";
+	
+	if ( enTrans[verb].enGerund === undefined ) {
+		strGerund = strBase + "ing";
+	} else {
+		strGerund = enTrans[verb].enGerund;
+	}
+	
+	let strPerson = persons[person].enName;
+	
+	/******************************************************
+	Note: the verbs "Ser", "Estar", and "Poder" are handled as
+	special translation cases.
+	******************************************************/
+	
+	if (strVerb == "Ser" || strVerb == "Estar" || strVerb == "Poder") {
+			strEnglish = fnGetToBePhrase(verb, tense, person) ;
+	} else if (tense == cPresent && (strPerson == "He" || strPerson == "She")) {
+			strEnglish = strPerson + " " + strEn3ps;
+	} else if (tense == cPresent) {
+			strEnglish = strPerson + " " + strBase;
+	} else if (tense == cImperfect) {
+			strEnglish = strPerson + " used " + strInf;
+	} else if (tense == cPast) {
+			strEnglish = strPerson + " " + strPast;
+	} else if (tense == cFuture) {
+			strEnglish = strPerson + " will " + strBase;
+	} else if (tense == cConditional) {
+			strEnglish = strPerson + " would " + strBase;
+	} else if (tense == cPresent_Progressive) {
+			if (strPerson == "I") {
+				strEnglish = strPerson + " am " + strGerund;
+			} else if (strPerson == "He" || strPerson == "She") {
+				strEnglish = strPerson + " is " + strGerund;
+			} else {
+				strEnglish = strPerson + " are " + strGerund;
+			}
+	} else if (tense == cPresent_Perfect) {
+			if (strPerson == "He" || strPerson == "She") {
+				strEnglish = strPerson + " has " + strEnPp;
+			} else {
+				strEnglish = strPerson + " have " + strEnPp;
+			}
+	}
+
+	return(strEnglish);
+}
+
+function fnGetToBePhrase(verbIdx, tense, person)  {
+	let strEnglish = "Not Found";
+	
+	
+	let verb = verbIdx;
+	let strVerb = enTrans[verb].spName;
+	
+	let strInf = enTrans[verb].enInf;
+	let strBase = enTrans[verb].enBase;
+	let strEn3ps = enTrans[verb].en3ps;
+	let strPast = enTrans[verb].enPast;
+	let strEnPp = enTrans[verb].enPp;
+	let strGerund = enTrans[verb].enGerund;
+	let strPerson = persons[person].enName;
+	
+	var isPoder = false;
+	var strPoderEnding = "";
+
+	//{spName: "Ser", enInf: "to be",  enBase: "be", en3ps: "is", enPast: "was", enPp: "been",
+	//enGerund: "being"} 
+	
+	//"Poder" is translated as "to be able to" so if that is the current verb, we take on an
+	// ending to "to be" translation.
+	
+	if (strVerb == "Poder") { 
+		strPoderEnding = " able to"
+	}
+	
+	if (tense == cPresent && (strPerson == "He" || strPerson == "She")) {
+			strEnglish = strPerson + " " + strEn3ps + strPoderEnding; 
+	} else if (tense == cPresent) {
+		if (strPerson == "I") { 
+			strEnglish = "I am" + strPoderEnding;
+		} else if (strPerson == "He" || strPerson == "She") {
+			strEnglish = strPerson + " is " + strPoderEnding;
+		} else {
+			strEnglish = strPerson + " are " + strPoderEnding;
+		}
+	} else if (tense == cImperfect) {
+			strEnglish = strPerson + " used " + strInf + strPoderEnding;
+	} else if (tense == cPast) {
+		if (strPerson == "I" || strPerson == "He" || strPerson == "She") {
+			strEnglish = strPerson + " was " + strPoderEnding;
+		} else {
+			strEnglish = strPerson + " were " + strPoderEnding;
+		}
+	} else if (tense == cFuture) {
+			strEnglish = strPerson + " will " + strBase + strPoderEnding;
+	} else if (tense == cConditional) {
+			strEnglish = strPerson + " would " + strBase + strPoderEnding;
+	} else if (tense == cPresent_Progressive) {
+			if (strPerson == "I") {
+				strEnglish = strPerson + " am " + strGerund + strPoderEnding;
+			} else if (strPerson == "He" || strPerson == "She") {
+				strEnglish = strPerson + " is " + strGerund + strPoderEnding;
+			} else {
+				strEnglish = strPerson + " are " + strGerund + strPoderEnding;
+			}
+	} else if (tense == cPresent_Perfect) {
+			if (strPerson == "He" || strPerson == "She") {
+				strEnglish = strPerson + " has " + strEnPp + strPoderEnding;
+			} else {
+				strEnglish = strPerson + " have " + strEnPp + strPoderEnding;
+			}
+	}
+	
+	if (strPoderEnding.length == 0) {
+		strEnglish = strEnglish + " [" + strVerb + "]";
+	}
+	return(strEnglish);
+}
+
+function firstUpper(str){
+	var retVal = "";
+	
+	// Check for case when the first letter contains an accent, like "&Iacute;bamos"
+	// If found, make the second character upper case
+	if (str[0] === "&") {
+		retVal = str[0] + str[1].toUpperCase() + str.slice(2).toLowerCase() ;
+	} else { 
+		retVal = str[0].toUpperCase() + str.slice(1).toLowerCase() ;
+	}
+	
+	return (retVal);
+
+}
+
+
+function update_subset_check(pOpt) {
+
+  let ddSubset = document.getElementById("ddSubset");
+  let ddVerbs = document.getElementById("ddVerbs");
+
+  gblSubset = ddSubset.value.toLowerCase();
+  let strSubset = gblSubset;
+
+
+	// Check whether we're working on a subset of verbs (e.g., Special Handling  )
+  // If so, load a subset of verbs into the array Ary
+		const ary = [];
+		spVerbs.map(el => ary.push(el.spName));
+		ary.sort();
+
+  	//First clear out the options in the dropdown box);
+		var select = document.getElementById("ddVerbs");
+		var saveTopEntry = ddVerbs[0].innerHTML;
+		var options = document.querySelectorAll('#ddVerbs option');
+		options.forEach(o => o.remove());
+		
+		const opt = document.createElement("option");
+  	opt.value = "";
+  	opt.text = saveTopEntry;
+  	ddVerbs.add(opt);
+
+  	// Check whether we need to reset to a full default list
+	  if (strSubset == "") {
+	  	// Reset the global temporary verb list (which may currently be a subset)
+			gblTmpVerbs = [] ;
+			for (var i = 0; i < ary.length; i++) {
+				gblTmpVerbs[i] = ary[i];
+			}
+			// Now reload the dropdown box
+			ary.forEach(verb => {
+  				const option = document.createElement("option");
+  				option.value = verb;
+  				option.text = decodeHTMLEntities(verb);
+  				ddVerbs.add(option);
+			}); 
+	  } else if (strSubset == "normal" || strSubset == "special") {
+  			var strSpecial = "";
+  			if (strSubset == "normal") { 
+  				strSpecial = "0"; 
+  			} else if (strSubset == "special") {
+  			  strSpecial = "1";
+				}
+				
+				gblTmpVerbs = [] ;
+				var idxVerb = -1;
+				for(var i = 0; i < ary.length; i++) {
+						idxVerb = get_verb_info(ary[i]);
+						if (spVerbs[idxVerb].special == strSpecial) {
+							gblTmpVerbs.push(ary[i]);	
+		 					const option = document.createElement("option");
+  						option.value = ary[i];
+  						option.text = decodeHTMLEntities(ary[i]);
+  						ddVerbs.add(option);
+					}
+			} 
+
+		} else if (["white", "blue", "pink", "yellow"].indexOf(strSubset) > -1)  {
+			gblTmpVerbs = [] ;
+			var idxVerb = -1;
+			for(var i = 0; i < ary.length; i++) {
+					idxVerb = get_verb_info(ary[i]);
+					if (spVerbs[idxVerb].cardColor == strSubset) {
+						gblTmpVerbs.push(ary[i]);	
+	 					const option = document.createElement("option");
+  					option.value = ary[i];
+  					option.text = decodeHTMLEntities(ary[i]);
+  					ddVerbs.add(option);
+					}
+			}
+		} else if (strSubset == "review") {
+			gblTmpVerbs = [] ;
+			var idxVerb = -1;
+			for(var i = 0; i < ary.length; i++) {
+					idxVerb = get_verb_info(ary[i]);
+					if (spVerbs[idxVerb].review == true) {
+						gblTmpVerbs.push(ary[i]);	
+	 					const option = document.createElement("option");
+  					option.value = ary[i];
+  					option.text = decodeHTMLEntities(ary[i]);
+  					ddVerbs.add(option);
+					}
+			}
+
+		}
+	
+		if (ddSubset.selectedIndex > 0) {
+			ddVerbs[0].innerHTML = "-- " + (ddVerbs.length - 1) + " " + ddSubset.options[ddSubset.selectedIndex].text ;
+		} else {
+			ddVerbs[0].innerHTML = "------ All Verbs -----";
+		}
+}
+
+
+function get_verb_info(pVerb) {
+
+		return (spVerbs.findIndex(verb => verb.spName == pVerb)); 
+
+}
+
+
+function update_verb_check() {
+
+	gblVerb = document.getElementById("ddVerbs").value; 
+	if (gblVerb.length == 0) {
+		gblVerbSaved = 0;
+		gblTenseSaved = 0;
+		gblPersonSaved = 0;
+	}
+
+}
+
+function update_tense_check() {
+
+	gblTense = document.getElementById("ddTenses").value; 
+
+}
+
+function update_person_check() {
+
+	gblPerson = document.getElementById("ddPersons").value; 
+
+}
+
+
+function timer_check() {
+
+	gblTimer = document.getElementById("timer").value;
+	if (gblTimer == "answer") {
+		document.getElementById("show-answer-btn").style.visibility = "visible";
+	} else {
+		document.getElementById("show-answer-btn").style.visibility = "hidden";
+	} 
+
+}
+
+function translation_check() {
+ 
+	gblTranslationDirection = document.getElementById("translation").value;
+	
+}
+
+function presentation_check() {
+
+	gblPresentation = document.getElementById("presentation").value;
+
+}
+
+function infinitive_only_check() {
+
+	gblInfinitiveOnly = document.getElementById("infinitiveOnly").value;
+
+}
+
+function fnMain() {
+	var html;
+	var idxValue = 0;
+	var strSpanish = "";
+	
+	let obj = fnGetNextVerb();
+	
+	let verb = obj.verb;
+	let tense = obj.tense;
+	let person = obj.person; 
+	
+	if (verb == -1) {
+		return {verb: verb, "english": "No verb selected", "spanish": "Choose another option", reviewFlag: false };	
+	}
+
+	if (gblVerb.length > 0) {
+		idxValue = spVerbs.findIndex(verb => verb.spName == gblVerb); 
+		if (idxValue == -1) { 
+			return( strVerb + " not found in verbs array" );
+		} else { 
+			verb = idxValue;
+		} 
+	}
+	
+	if (gblTense.length > 0) {
+		tense = parseInt(gblTense);
+	}
+	
+	if (gblPerson.length > 0) {
+		person = parseInt(gblPerson);
+	}
+	
+	let strVerb = spVerbs[verb].spName;
+
+	
+	let reviewFlag = false;  // Default to false
+	if (!(spVerbs[verb].review === undefined)) {
+		reviewFlag = spVerbs[verb].review;
+	}
+	
+
+
+	idxValue = enTrans.findIndex(verb => verb.spName == strVerb); 
+	let strEnVerb = enTrans[idxValue].enInf;
+	let strTense = tenses[tense].name;
+	let strPerson = persons[person].spName;
+	let intPerson = persons[person].person;
+	let v = verb.toString();
+	let t = tense.toString();
+	let p = person.toString();
+	let strEnglish = "";
+
+	if (gblInfinitiveOnly == 1) {
+		// "Poder" is a special case
+		if (strVerb == "Poder") { 
+			strEnVerb = strEnVerb + " able to";
+		}
+		strEnglish = firstUpper(strEnVerb);
+		strSpanish = strVerb;
+	} else {
+
+		strEnglish = fnGetEnglishPhrase(verb, tense, person);
+	
+		let strInfo = "Verb: " + strVerb + " (" + strEnVerb + 
+					") " + v + " -- Tense: [" + strTense + 
+					"] " + t + " -- Person: [" + strPerson + "] " + p;
+
+		strSpanish = fnGetConjugatedVerb(verb, tense, person);
+
+	}
+
+	//document.getElementById("h3").innerHTML = strInfo; 
+
+	//document.getElementById("h3").innerHTML = verb.toString() + " " +	tense.toString() + " " + person.toString();
+	
+	//document.getElementById("p1").innerHTML = "English Phrase: " + strEnglish;
+	//document.getElementById("p2").innerHTML = "Info: " + strInfo;
+	//document.getElementById("p3").innerHTML = "Conjugated Verb: " + strSpanish; 
+
+
+	return {verb: verb, "english": strEnglish, "spanish": strSpanish, "reviewFlag": reviewFlag };
+	
+
+}
+
+
+
+	function showAnswer(reviewFlag) {
+		
+		//	document.getElementById("ans").style.display="block";
+		document.getElementById("ans").style.visibility="visible"; 
+		document.getElementById("review-btn").style.visibility="visible"; 
+
+		if (document.getElementById("hidden-verb").innerHTML == -1) {
+					document.getElementById("review-btn").style.visibility="hidden"; 
+					gblVerb = 0;
+		} else {
+			// If the flag is true, we usee the "Remove" text
+			document.getElementById("review-btn").style.visibility="visible"; 
+			if (reviewFlag) {
+				document.getElementById("review-btn").innerHTML = gblReviewRemove;
+			} else {
+				document.getElementById("review-btn").innerHTML = gblReviewAdd;
+			}
+	}
+	}
+		
+	function showClickedAnswer() {
+		document.getElementById("ans").style.visibility="visible";  	
+	}
+
+  function updateReview() {
+   
+    let btn = document.getElementById("review-btn");
+    let strVerbIdx = document.querySelector('#hidden-verb').innerHTML;
+    let verb = spVerbs[parseInt(strVerbIdx)];
+
+    if (btn.innerHTML.slice(0,3) == "Add") {
+		  btn.innerHTML = gblReviewRemove;
+		  verb.review = true;
+		} else {
+ 		  btn.innerHTML = gblReviewAdd;
+		  verb.review = false;
+    }
+
+    // Reset set entire list in the cookie
+    let strCookie = "";
+    for (var i =0; i < spVerbs.length; i++) {
+			if (spVerbs[i].review == true) {
+				strCookie = strCookie + i.toString() + ",";
+			}
+    }
+
+    if (strCookie.length > 0) {
+    	strCookie = strCookie.slice(0, strCookie.length - 1);
+    } 
+
+
+    del_cookie(cCookieName);
+    setCookie(cCookieName, strCookie, 60);
+
+  }
+
+
+  function showNextCard() {
+
+		let obj = fnMain(); // Returns the English phrase, and Spanish
+		let verb = obj.verb;
+		let strEnglish = obj.english; 
+		let strSpanish = obj.spanish;
+		let reviewFlag = obj.reviewFlag;
+
+ 
+    showCard(verb, strEnglish, strSpanish, reviewFlag);
+  
+  }
+
+  
+
+  function showCard(verb, strEnglish, strSpanish, reviewFlag) {
+		var strTo = "";
+		var strFrom = "";
+		var strReview = "";
+
+		let strVerbIdx = verb.toString();
+
+			if (gblTranslationDirection == cEnglishToSpanish) {
+				strFrom = strEnglish;
+				strTo = strSpanish;
+			} else {
+				strTo = strEnglish;
+				strFrom = strSpanish;
+			}
+	
+			// Check the status of the review flag
+			if (reviewFlag) {
+				strReview = gblReviewRemove;
+			} else {			
+				strReview = gblReviewAdd;
+			}
+
+      flashcardContainer.innerHTML = `
+			<div class="wrapper">
+       			<span id="hidden-verb" style="height: 1px; visibility: hidden">${strVerbIdx}</span><br>
+        		<div class="flashcard">
+          		<div class="question">${strFrom}</div>
+			 		<p>
+          		<div class="answer" id="ans">${strTo}</div>        		
+		        	<div class="review">
+    	    			<button onclick="updateReview()" class="review" id="review-btn">${strReview}</button>
+    	    		</div>
+        		</div>
+			</div>
+      `;
+
+
+
+			//document.getElementById("ans").style.display="none";
+    	document.getElementById("ans").style.visibility="hidden";
+    	document.getElementById("review-btn").style.visibility="hidden";
+    	if (gblTimer == "answer") {
+				document.getElementById("show-answer-btn").style.visibility="visible";
+    	} else {
+				document.getElementById("show-answer-btn").style.visibility="hidden";
+				setTimeout(showAnswer, (gblTimer * 1000), reviewFlag);
+    	}
+  	
+  }
+
+
+
+    // Set up the card
+    let dropdownContainer = document.querySelector('#dropdown-container');
+	  let flashcardContainer = document.querySelector('#flashcard-container');
+    let newCardBtn = document.querySelector('#new-card-btn');
+   	let continueBtn = document.querySelector('#show-answer-btn');
+    let currentCard = 0;
+	  let ansVis = 0;
+
+
+    newCardBtn.addEventListener('click', showNextCard);
+    continueBtn.style.visibility = "hidden";
+    continueBtn.addEventListener('click', showClickedAnswer);
+  
+    showCard(0, "The target word will display for countdown seconds...", "Then the translation will display", false);
+    // let reviewClassContainer = document.querySelector('#review-btn');
+    document.getElementById("review-btn").style.display = "none";
+
+</script>
+
+
+</body>
+</html>
+ 
