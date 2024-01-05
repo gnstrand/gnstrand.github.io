@@ -2303,6 +2303,8 @@ function fnMain() {
 
   function updateReview() {
    
+  	closeNav(); // Close any open Navigation/Documentation
+
     let btn = document.getElementById("review-btn");
     let strVerbIdx = document.querySelector('#hidden-verb').innerHTML;
     let verb = spVerbs[parseInt(strVerbIdx)];
@@ -2336,9 +2338,7 @@ function fnMain() {
 
   function showNextCard() {
 
-  	// Close any open Navigation/Documentation
-
-  	closeNav();
+  	closeNav(); // Close any open Navigation/Documentation
 
 		let obj = fnMain(); // Returns the English phrase, and Spanish
 		let verb = obj.verb;
