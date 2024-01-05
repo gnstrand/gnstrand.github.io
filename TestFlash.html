@@ -2,17 +2,16 @@
 <!DOCTYPE html>
 <!-- html manifest="WHSFlashcard.appcache" --> 
 <head>
- 	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/> 
+ 	<meta name="viewport" content="user-scalable=no, width=360, initial-scale=1.0, maximum-scale=1.0"/> 
 	<meta name="apple-mobile-web-app-capable" content="yes" /> 
 	<meta name="apple-mobile-web-app-status-bar-style" content="black" /> 
-	<!-- link rel="apple-touch-icon" href="iphon_tetris_icon.png" --> 
-	<!-- link rel="apple-touch-startup-image" href="startup.png" --> 
 
   <title>Flashcard App</title>
 
   <style>
     body {
       font-family: sans-serif;
+      width: 380px;
     }
 	.wrapper {
 		position: relative;
@@ -30,7 +29,7 @@
     align-items: center;
     justify-content: center;
     height: 200px;
-    width: 340px;
+    width: 320px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
@@ -47,8 +46,8 @@
   		display: inline-block;
   		width: 200px; /* set the width as per your requirement */
   		text-align: left;
-  		margin-right: 10px; /* add some spacing between label and input control */
-		padding-left: 10px;
+  		margin-right: 5px; /* add some spacing between label and input control */
+		padding-left: 5px;
 	}
 
   h2 {
@@ -59,7 +58,7 @@
   	margin-left: 45px;
   	/* justify-content: center; */
   	color: red;
-  	animation: titleMove 3s;
+  	/* animation: titleMove 3s; */
   }
 
 
@@ -103,10 +102,12 @@
  		bottom: 2px;
  		right: 10px;
  		width: 170px;
- 		height: 15px;
+ 		height: 20px;
 	}  
 
 	.button {
+		-moz-appearance: none;
+  	-webkit-appearance: none;
 		display: block;
 		width: 340px;
 		height: 10px;
@@ -117,8 +118,8 @@
     justify-content: center; 
 		font-size: 1.8em;
 		font-weight: bold;
+		border-radius: 6px;
 	}
-
 
 	.tooltip {
   	position: relative;
@@ -144,37 +145,162 @@
   	/* left:0%; */
   	/* margin-left: -150px; */
 
-}
+	}
 
 	.tooltip:hover .tooltiptext {
  	 visibility: visible;
 	}
 
-  </style>
+
+.hamburger-icon  {
+  left: 20px;
+  top: 1.6em;
+  margin-left: 5px;
+/*
+  border-bottom: 0.125em solid black;
+  border-top: 0.375em double black;
+  bottom: 1.1875em black;
+  height: 0.125em;
+*/
+  border-bottom: 0.20em solid black; 
+  border-top: 0.6em double black;
+  bottom: 2.2em black;
+  height: 0.21em;
+  
+  content: "";
+  position: absolute;
+  right: 2em;
+  width: 1.2em;
+}
+
+.sidebar {
+  height: 210px;
+  width: 0;
+  position: absolute;
+  z-index: 1;
+  top: 60px;
+  left: 15px;
+  background-color: #f36e24;
+  overflow-x: hidden;
+  transition: 0.1s;
+  padding-top: 30px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.sidebar a {
+  padding: 5px 5px 5px 10px;
+  text-decoration: none;
+  font-size: 0.9em;
+  color: white;
+  display: block;
+  transition: 0.1s;
+  
+}
+
+.sidebar a:hover {
+  color: #ccc;
+}
+
+.sidebar .closebtn {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  font-size: 20px;
+  margin-left: 50px;
+}
+
+.openbtn {
+  font-size: 30px;
+  cursor: pointer;
+  background-color: #345b75;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+}
+
+#myBox {
+	z-index: 2;
+	position: absolute;
+  visibility: hidden;
+  top: 160px;
+  left: 75px;
+  width: 320px;
+  background-color: #EBEFF1;
+  color: black;
+  padding: 10px 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  transition: 0.1s;
+}
+
+#myMsg {
+    visibility: hidden;
+}
+
+#closeDoc {
+	font-family: sans-serif;
+  font-size: 1.2em;
+	font-weight: bold;
+	width: 10px;
+  padding: 1px;
+  color: black;
+  text-decoration: none;
+  float: right ;
+  /*
+  border: 1px solid #EBEFF1;
+  background-color: #345b75;
+  border-radius: 5px;
+  visibility: visible; 
+  */
+}
+
+.docHeading {
+	font-size: 14px; 
+	font-weight: bold; 
+	text-align: center
+}
+
+.docText {
+  font-size: 0.9em;
+} 
+
+
+</style>
 </head>
 
 
 <body onload="initControls()">
+  <a href="#" class="hamburger-icon" onclick="openNav()"></a>
+	<h2>Warren Hardy Flash Cards</h2>
+<div>
+<div id="mySidebar" class="sidebar">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">x</a>
+  <a id="about" href="#" onclick="showInfo(this)">About</a>
+  <a id="howto" href="#" onclick="showInfo(this)">How To Use</a>
+  <a id="filter" href="#" onclick="showInfo(this)" >Filtering the Verb List</a>
+  <a id="presentation" href="#" onclick="showInfo(this)" >Presentation Order</a>
+  <a id="timer" href="#" onclick="showInfo(this)">Time Delay</a>
+  <a id="reset" href="#" onclick="showInfo(this)">Reset Saved Info</a>
+	<a id="buymeabeer" href="#" onclick="showInfo(this)">Buy Me a Beer</a>
+</div>
 
-	<div class="tooltip">
-		<h2>Warren Hardy Flash Cards</h2>
-		<span class="tooltiptext">
-			This is the placeholder text describing the functioning of the app.<p>
-	 		This app is designed to mimic the 100 cards in the flash card deck that is used widely at
-	  <span style="font-weight: bold">Warren Hardy School</span> in San Miguel de Allende, Mexico.
-		</span>
-	</div>
-	<br>
+<div id="myBox">
+  <a id="closeDoc" href="javascript: void(0)" onclick="closeDoc()">x</a>
+  <div id="myMsg"></div>
+</div>
 
-	<label id="lbl0" for="timer">Choose direction:</label>&nbsp;
-	<select onchange="translation_check()" id="translation" name="translation">
+
+	<label id="lbl0" for="ddTranslation">Choose direction:</label>&nbsp;
+	<select onchange="translation_check()" id="ddTranslation" name="ddTranslation">
 		<option value="1">English to Spanish</option>
 		<option value="2">Spanish to English</option>
 	</select>
 	<br>
 
-	<label id="lbl0a" for="timer">Choose presentation order:</label>&nbsp;
-	<select onchange="presentation_check()" id="presentation" name="presentation">
+	<label id="lbl0a" for="ddPresentation">Choose presentation order:</label>&nbsp;
+	<select onchange="presentation_check()" id="ddPresentation" name="ddPresentation">
 		<option value="1">Random</option>
 		<option value="2">Rolodex</option>
 	</select>
@@ -184,12 +310,13 @@
 	<label id="lbl0b" for="ddSubset">Choose a filter:</label>&nbsp;
 	<select onchange="update_subset_check()" name="ddSubset" id="ddSubset">
 		<option value="">------ No Filters -----</option>
-		<option value="special">Special Cards</option>
-		<option value="normal">Normal Cards</option>
-		<option value="white">White Cards</option>
-		<option value="blue">Blue Cards</option>
-		<option value="pink">Pink Cards</option>
-		<option value="yellow">Yellow Cards</option>
+		<!-- option value="special">Special Cards</option -->
+		<!-- option value="normal">Normal Cards</option -->
+		<option value="white">AR verbs</option>
+		<option value="blue">ER/IR verbs</option>
+		<option value="pink">Irregular verbs</option>
+		<option value="yellow">Reflexive verbs</option>
+		<option value="power">Power Verbs</option>
 		<option value="review">Review List</option>
 	</select>
 	<br>
@@ -213,15 +340,15 @@
 	</select>
 	<br>
 	
-	<label id="lbl2" for="timer">Choose a time delay:</label>&nbsp;
-	<select onchange="timer_check()" id="timer" name="timer">
-		<option value="0" selected>No delay</option>
+	<label id="lbl2" for="ddTimer">Choose a time delay:</label>&nbsp;
+	<select onchange="timer_check()" id="ddTimer" name="ddTimer">
+		<option value="0">No delay</option>
 		<option value="1">1 second</option>
  		<option value="2">2 seconds</option>
 		<option value="3">3 seconds</option>
 		<option value="4">4 seconds</option>
 		<option value="5">5 seconds</option>
-		<option value="6">6 second</option>
+		<option value="6">6 seconds</option>
  		<option value="7">7 seconds</option>
 		<option value="8">8 seconds</option>
 		<option value="9">9 seconds</option>
@@ -235,7 +362,7 @@
 		<option value="0" selected>No</option>
 		<option value="1">Yes</option>
 	</select>
-
+</div>
 
   <div id="wrapper">  
   	<div id="flashcard-container"></div>
@@ -246,6 +373,7 @@
 		</div>
 	</div>	
 
+	<div id="myMsgbox" class="msgbox"></div>
 
 <script>
 
@@ -308,6 +436,52 @@ const tenses = [
 	{ name: "Present Perfect" }
 ] ;
 		
+
+function showInfo(elem) {
+
+	var mySidebar = document.getElementById("mySidebar");
+	var myBox = document.getElementById("myBox");
+  var myMsg = document.getElementById("myMsg");
+  var myClose = document.getElementById("closeDoc");
+  var opt = elem.id;
+  var rec = elem.getBoundingClientRect();
+  var idx = 0;
+   
+  myBox.style.marginTop = (rec.top - 100).toString() + "px" ;
+  myBox.style.marginLeft = "-40px"; //document.getElementById("mySidebar").style.width;
+      
+ 	myClose.style.marginTop = "-5px";
+    
+ 	// mySidebar.style.opacity = "0.6";
+ 	myBox.style.visibility = "visible";
+  myMsg.style.visibility = "visible";
+  
+  // ******************************************************
+	// Now we get the corresponding text from the table
+	// and update the box with the documentation    	
+  // ******************************************************
+	idx = aryDocs.findIndex(docs => docs.topic == opt);
+  myMsg.innerHTML = aryDocs[idx].hdg + aryDocs[idx].info;
+     
+}
+
+function closeDoc() {
+  document.getElementById("myMsg").style.visibility = "hidden";
+  // document.getElementById("mySidebar").style.opacity = "1.0";
+  document.getElementById("myBox").style.visibility = "hidden";
+}
+
+function openNav() {
+  document.getElementById("mySidebar").style.width = "180px";
+}
+
+function closeNav() {
+  document.getElementById("myBox").style.visibility = "hidden";
+  document.getElementById("myMsg").style.visibility = "hidden";
+  document.getElementById("mySidebar").style.width = "0";
+
+}
+
 // *********************************************************************************
 //
 //
@@ -318,106 +492,106 @@ const tenses = [
 
 
 const spVerbs = [
-{spName: "Abrir", special:"0", cardColor:"blue", review: false},
-{spName: "Acostarse", special: "0", cardColor: "yellow", sp1pStem: "Acuest", review: false},
-{spName: "Aprender", special:"0", cardColor:"blue", review: false},
-{spName: "Arreglar", special:"0", cardColor:"white", review: false},
-{spName: "Ayudar", special:"0", cardColor:"white", review: false},
-{spName: "Ba&ntilde;arse", special: "0", cardColor: "yellow", review: false},
-{spName: "Bailar", special:"0", cardColor:"white", review: false},
-{spName: "Bajar", special:"0", cardColor:"white", review: false},
-{spName: "Buscar", special:"0", cardColor:"white", sp1pPret: "Busqu&eacute;", review: false},
-{spName: "Cambiar", special:"0", cardColor:"white", review: false},
-{spName: "Caerse", special:"1", cardColor:"yellow", review: false},
-{spName: "Caminar", special:"0", cardColor:"white", review: false},
-{spName: "Cantar", special:"0", cardColor:"white", review: false},
-{spName: "Cerrar", special:"0", cardColor:"white",  sp1pStem: "Cierr", review: false},
-{spName: "Cocinar", special:"0", cardColor:"white", review: false},
-{spName: "Comer", special:"0", cardColor:"blue", review: false},
-{spName: "Comprar", special:"0", cardColor:"white", review: false},
-{spName: "Conocer", special:"0", cardColor:"pink", sp1pPres: "Conozco", review: false},
-{spName: "Conseguir", special:"0", cardColor:"blue", sp1pStem: "Consigu", sp1pPres: "Consigo", sp3pPretStem: "Consigu", review: false},
-{spName: "Contestar", special:"0", cardColor:"white", review: false},
-{spName: "Correr", special:"0", cardColor:"blue", review: false},
-{spName: "Creer", special:"0", cardColor:"blue", review: false},
-{spName: "Dar", special:"1", cardColor:"pink", review: false},
-{spName: "Decidir", special:"0", cardColor:"blue", review: false},
-{spName: "Decir", special:"1", cardColor:"pink", review: false},
-{spName: "Dejar", special:"0", cardColor:"white", review: false},
-{spName: "Descansar", special:"0", cardColor:"white", review: false},
-{spName: "Divertirse", special:"0", cardColor:"yellow", sp1pStem: "Diviert", review: false},
-{spName: "Dormir", special:"0", cardColor:"blue", sp1pStem: "Duerm", sp3pPretStem: "Durm", spGerund: "Durmiendo" , review: false},
-{spName: "Empezar", special:"0", cardColor:"white", sp1pStem: "Empiez", sp1pPret: "Empec&eacute;", review: false},
-{spName: "Encontrar", special:"0", cardColor:"white", sp1pStem: "Encuentr", review: false},
-{spName: "Enfermarse", special:"0", cardColor:"yellow", review: false},
-{spName: "Entender", special:"0", cardColor:"blue", review: false},
-{spName: "Eschuchar", special:"0", cardColor:"white", review: false},
-{spName: "Escribir", special:"0", cardColor:"blue", review: false},
-{spName: "Esperar", special:"0", cardColor:"white", review: false},
-{spName: "Estar", special:"1", cardColor:"pink", review: false},
-{spName: "Estudiar", special:"0", cardColor:"white", review: false},
-{spName: "Firmar", special:"0", cardColor:"white", review: false},
-{spName: "Ganar", special:"0", cardColor:"white", review: false},
-{spName: "Gastar", special:"0", cardColor:"white", review: false},
-{spName: "Hablar", special:"0", cardColor:"white", review: false},
-{spName: "Hacer", special:"1", cardColor:"pink", review: false},
-{spName: "Invitar", special:"0", cardColor:"white", review: false},
-{spName: "Ir", special:"1", cardColor:"pink", review: false},
-{spName: "Jugar", special:"0", cardColor:"white", sp1pStem: "Jueg", sp1pPret: "Jugu&eacute;", review: false},
-{spName: "Lavarr", special:"0", cardColor:"white", review: false},
-{spName: "Leer", special:"1", cardColor:"pink", review: false},
-{spName: "Levantarse", special:"0", cardColor:"yellow", review: false},
-{spName: "Limpiar", special:"0", cardColor:"white", review: false},
-{spName: "LLegar", special:"0", cardColor:"white", sp1pPret: "Llequ&eacute;", review: false},
-{spName: "Llenar", special:"0", cardColor:"white", review: false},
-{spName: "Llevar", special:"0", cardColor:"white", review: false},
-{spName: "Mandar", special:"0", cardColor:"white", review: false},
-{spName: "Manejar", special:"0", cardColor:"white", review: false},
-{spName: "Mover", special:"0", cardColor:"blue", review: false},
-{spName: "Mudarser", special:"0", cardColor:"yellow", review: false},
-{spName: "Necesitar", special:"0", cardColor:"white", review: false},
-{spName: "Oir", special:"1", cardColor:"pink", review: false},
-{spName: "Olvidar", special:"0", cardColor:"white", review: false},
-{spName: "Ordenar", special:"0", cardColor:"white", review: false},
-{spName: "Pagar", special:"0", cardColor:"white", sp1pPret: "Pagu&eacute;", review: false},
-{spName: "Pasar", special:"0", cardColor:"white", review: false},
-{spName: "Pedir", special:"0", cardColor:"blue", sp1pStem: "Pid", sp3pPretStem: "Pid", review: false},
-{spName: "Pensar", special:"0", cardColor:"white", review: false},
-{spName: "Perder", special:"0", cardColor:"blue", sp1pStem: "Pierd", review: false},
-{spName: "Platicar", special:"0", cardColor:"white", sp1pPret: "Platiqu&eacute;", review: false},
-{spName: "Poder", special:"1", cardColor:"pink", review: false},
-{spName: "Poner", special:"1", cardColor:"pink", review: false},
-{spName: "Preguntar", special:"0", cardColor:"white", review: false},
-{spName: "Preparar", special:"0", cardColor:"white", review: false},
-{spName: "Presentar", special:"0", cardColor:"white", review: false},
-{spName: "Probar", special:"0", cardColor:"white", sp1pStem: "Prueb", review: false},
-{spName: "Querer", special:"1", cardColor:"pink", review: false},
-{spName: "Quitar", special:"0", cardColor:"white", review: false},
-{spName: "Recibir", special:"0", cardColor:"blue", review: false},
-{spName: "Recomendar", special:"0", cardColor:"white", review: false},
-{spName: "Recordar", special:"0", cardColor:"white", sp1pStem: "Recuerd", review: false},
-{spName: "Regresar", special:"0", cardColor:"white", review: false},
-{spName: "Saber", special:"1", cardColor:"pink", review: false},
-{spName: "Sacar", special:"0", cardColor:"white", sp1pPret: "Saqu&eacute;", review: false},
-{spName: "Salir", special:"0", cardColor:"blue", sp1pPres: "Salgo", spFutCondStem: "Saldr", review: false},
-{spName: "Seguir", special:"0", cardColor:"blue", sp1pStem: "Sigu", sp1pPres: "Sigo", sp3pPretStem: "Sigu", review: false},
-{spName: "Sentarse", special:"0", cardColor:"yellow", sp1pStem: "Sient", review: false},
-{spName: "Ser", special:"1", cardColor:"pink", review: false},
-{spName: "Subir", special:"0", cardColor:"blue", review: false},
-{spName: "Tener", special:"1", cardColor:"pink", review: false},
-{spName: "Terminar", special:"0", cardColor:"white", review: false},
-{spName: "Tocar", special:"0", cardColor:"white", sp1pPret: "Toqu&eacute;", review: false},
-{spName: "Tomar", special:"0", cardColor:"white", review: false},
-{spName: "Trabajar", special:"0", cardColor:"white", review: false},
-{spName: "Traer", special:"1", cardColor:"pink", review: false},
-{spName: "Tratar", special:"0", cardColor:"white", review: false},
-{spName: "Usar", special:"0", cardColor:"white", review: false},
-{spName: "Vender", special:"0", cardColor:"blue", review: false},
-{spName: "Venir", special:"1", cardColor:"pink", review: false},
-{spName: "Ver", special:"1", cardColor:"blue", review: false},
-{spName: "Viajar", special:"0", cardColor:"white", review: false},
-{spName: "Visitar", special:"0", cardColor:"white", review: false},
-{spName: "Vivir", special:"0", cardColor:"blue", review: false}
+{spName: "Abrir", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Acostarse", special: "0", cardColor: "yellow", sp1pStem: "Acuest", review: false, power: false},
+{spName: "Aprender", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Arreglar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Ayudar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Ba&ntilde;arse", special: "0", cardColor: "yellow", review: false, power: false},
+{spName: "Bailar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Bajar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Buscar", special:"0", cardColor:"white", sp1pPret: "Busqu&eacute;", review: false, power: false},
+{spName: "Cambiar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Caerse", special:"1", cardColor:"yellow", review: false, power: false},
+{spName: "Caminar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Cantar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Cerrar", special:"0", cardColor:"white",  sp1pStem: "Cierr", review: false, power: false},
+{spName: "Cocinar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Comer", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Comprar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Conocer", special:"0", cardColor:"pink", sp1pPres: "Conozco", review: false, power: false},
+{spName: "Conseguir", special:"0", cardColor:"blue", sp1pStem: "Consigu", sp1pPres: "Consigo", sp3pPretStem: "Consigu", review: false, power: false},
+{spName: "Contestar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Correr", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Creer", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Dar", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Decidir", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Decir", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Dejar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Descansar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Divertirse", special:"0", cardColor:"yellow", sp1pStem: "Diviert", review: false, power: false},
+{spName: "Dormir", special:"0", cardColor:"blue", sp1pStem: "Duerm", sp3pPretStem: "Durm", spGerund: "Durmiendo" , review: false, power: false},
+{spName: "Empezar", special:"0", cardColor:"white", sp1pStem: "Empiez", sp1pPret: "Empec&eacute;", review: false, power: false},
+{spName: "Encontrar", special:"0", cardColor:"white", sp1pStem: "Encuentr", review: false, power: false},
+{spName: "Enfermarse", special:"0", cardColor:"yellow", review: false, power: false},
+{spName: "Entender", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Eschuchar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Escribir", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Esperar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Estar", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Estudiar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Firmar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Ganar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Gastar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Hablar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Hacer", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Invitar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Ir", special:"1", cardColor:"pink", review: false, power: true},
+{spName: "Jugar", special:"0", cardColor:"white", sp1pStem: "Jueg", sp1pPret: "Jugu&eacute;", review: false, power: false},
+{spName: "Lavarr", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Leer", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Levantarse", special:"0", cardColor:"yellow", review: false, power: false},
+{spName: "Limpiar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "LLegar", special:"0", cardColor:"white", sp1pPret: "Llequ&eacute;", review: false, power: false},
+{spName: "Llenar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Llevar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Mandar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Manejar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Mover", special:"0", cardColor:"blue", sp1pStem: "Muev", review: false, power: false},
+{spName: "Mudarser", special:"0", cardColor:"yellow", review: false, power: false},
+{spName: "Necesitar", special:"0", cardColor:"white", review: false, power: true},
+{spName: "Oir", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Olvidar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Ordenar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Pagar", special:"0", cardColor:"white", sp1pPret: "Pagu&eacute;", review: false, power: false},
+{spName: "Pasar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Pedir", special:"0", cardColor:"blue", sp1pStem: "Pid", sp3pPretStem: "Pid", review: false, power: false},
+{spName: "Pensar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Perder", special:"0", cardColor:"blue", sp1pStem: "Pierd", review: false, power: false},
+{spName: "Platicar", special:"0", cardColor:"white", sp1pPret: "Platiqu&eacute;", review: false, power: false},
+{spName: "Poder", special:"1", cardColor:"pink", review: false, power: true},
+{spName: "Poner", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Preguntar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Preparar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Presentar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Probar", special:"0", cardColor:"white", sp1pStem: "Prueb", review: false, power: false},
+{spName: "Querer", special:"1", cardColor:"pink", review: false, power: true},
+{spName: "Quitar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Recibir", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Recomendar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Recordar", special:"0", cardColor:"white", sp1pStem: "Recuerd", review: false, power: false},
+{spName: "Regresar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Saber", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Sacar", special:"0", cardColor:"white", sp1pPret: "Saqu&eacute;", review: false, power: false},
+{spName: "Salir", special:"0", cardColor:"blue", sp1pPres: "Salgo", spFutCondStem: "Saldr", review: false, power: false},
+{spName: "Seguir", special:"0", cardColor:"blue", sp1pStem: "Sigu", sp1pPres: "Sigo", sp3pPretStem: "Sigu", review: false, power: false},
+{spName: "Sentarse", special:"0", cardColor:"yellow", sp1pStem: "Sient", review: false, power: false},
+{spName: "Ser", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Subir", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Tener", special:"1", cardColor:"pink", review: false, power: true},
+{spName: "Terminar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Tocar", special:"0", cardColor:"white", sp1pPret: "Toqu&eacute;", review: false, power: false},
+{spName: "Tomar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Trabajar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Traer", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Tratar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Usar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Vender", special:"0", cardColor:"blue", review: false, power: false},
+{spName: "Venir", special:"1", cardColor:"pink", review: false, power: false},
+{spName: "Ver", special:"1", cardColor:"blue", review: false, power: false},
+{spName: "Viajar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Visitar", special:"0", cardColor:"white", review: false, power: false},
+{spName: "Vivir", special:"0", cardColor:"blue", review: false, power: false}
 ] ;
 
 
@@ -710,12 +884,62 @@ const enTrans = [
 
 
 // *********************************************************************************
+// This section contains the text of the documentation topics 
+//
+//. <input type="button" onclick="location.href='https://google.com';" value="Go to Google" />
+//
+// *********************************************************************************
+
+
+const aryDocs = [
+  {topic: "about", hdg:"<div class='docHeading'>Overview</div><br>", info: 
+  	"<div class='docText'>This simple web page application contains the 100 verbs from the Warren Hardy School flash card deck, which is also available on his website (<a href='https://www.warrenhardy.com/product/verbcards-1'>WarrenHardy.com</a>). It is designed to be used when carrying the physical deck is cumbersome&#8212;for example when sitting in a park, traveling on a bus, or just having a spare moment or two. Currently, the app contains conjugations of the seven indicative tenses: present, imperfect, past, future, conditional, present progressive, present perfect). I may add the two subjunctive moods in a subsequent update.<br><br>This app is only intended to be a tool to complement educational material from the Warren Hardy School.</div>"
+  },
+  {topic: "howto", hdg:"<div class='docHeading'>How to Use</div><br>", info: 
+  	"<div class='docText'>By default, the list of 100 verbs with their 7 tenses and 5 &apos;persons&apos; will be randomly presented to you. You may select a time delay to allow an interval in which to say/guess you answer. You may also select various combinations from the drop-down boxes to control the content of the verbs presented. For example, you might choose to practice with a single verb, or a specific tense, or the &apos;<i>yo</i>&apos; form. You may even limit your list of verbs to the infinitive and just practice the verb definition.<br><br>When a verb appears, you may also save it for later review by clicking on the &quot;<i>Add to Review List</i>&quot; button. You may use this saved list to review specific verbs that interest you. You will find it as an option under the &quot;<i>Filter</i>&quot; drop-down.</div>"
+  },
+  {topic: "filter", hdg:"<div class='docHeading'>Filtering the Verb List</div><br>", info: 
+  	"<div class='docText'>You can further filter your verb choices by also selecting an option from the filter drop-down, including a list of verbs you may have saved for later review. When you select a filter, the list of verbs is modified and will be visible in the &quot;<i>Choose a verb</i>&quot; drop-down option.</div>"
+  },
+  {topic: "presentation", hdg:"<div class='docHeading'>Random or Rolodex?</div><br>", info: 
+  	"<div class='docText'>By default, the verbs, with their seven tenses and persons [I, you, (familiar) he/she/you (formal), us, they, you all] are presented in a random sequence, with a prompt in English.<br><br>If you want to use Warren Hardy&apos;s <I>Rolodex</I> method of controlling the sequence of conjugations, then changing the selection from &quot;Random&quot; to  &quot;Rolodex&quot; will accomplish that.</div>"
+  },
+  {topic: "timer", hdg:"<div class='docHeading'>Display Answers</div><br>", info: 
+  	"<div class='docText'>Using the time delay option allows you to control the amount of time with which to say/guess your answer, ranging for no time delay to 10 seconds.<br><br>You also have the option to pause the display of the answer until you are ready. You may choose the &quot;<I>Answer Button</I>&quot; option, which will then allow you to click the button when you are ready.</div>"
+  },
+  {topic: "reset", hdg:"<div class='docHeading'>Clear Saved Info</div><br>", info: 
+  	"<div class='docText'>If you want to clear the verbs you saved for review, click the button below.</div><p style='text-align: center'><button style='text-align: center; padding: 2 2 2 2; background-color: #D2E6D2; border-radius: 6px; border: 1px solid black' onclick='resetAll()'>Reset Saved Values</button></p>"
+  },
+  {topic: "buymeabeer", hdg:"<div class='docHeading'>Buy Me a Beer</div><br>", info: 
+  "<div class='docText'>If you find this little app useful and would like to see future enhancements, consider making a small donation by clicking the button below.</div><p style='text-align: center'><button style='text-align: center; padding: 2 2 2 2; background-color: #D2E6D2; border-radius: 6px; border: 1px solid black' onclick='buyMeABeer()'>Buy Me a Beer</button></p>"
+	},
+];
+
+
+//  {topic: "buymeabeer", hdg:"<div class='docHeading'>Comprame Una Cerveza</div><br>", info: "<p style='text-align: center'><div style='width: 130px; background-color: #D2E6D2; padding: 2px; border: 1px;'><a style='text-decoration:none' href='https://www.buymeacoffee.com/glennstranz'>Buy Me a Beer</a></div></p>"}
+
+
+function buyMeABeer() {
+
+	window.location.href="https://www.buymeacoffee.com/glennstranz";
+	closeNav();	
+
+}
+
+function resetAll() {
+
+	resetDefaults();
+	window.location.reload();
+	//closeDoc();
+
+} 
+
+// *********************************************************************************
 //
 //
 //
 //
 // *********************************************************************************
-
 
 // Global current verb. If string length == 0, then all verbs
 var gblSubset = "";
@@ -723,15 +947,16 @@ var gblVerb = "";
 var gblTense = "";
 var gblPerson = "";
 var gblTimer = 0;
-var gblTranslationDirection = 1;
+var gblTranslationDirection = "1";
 var gblInfinitiveOnly = 0;
-var gblPresentation = 1;
+var gblPresentation = "1";
 const cEnglishToSpanish = 1;
 const cSpanishToEnglish = 2;
-const cRandom = 1;
-const cRolodex = 2;
+const cRandom = "1";
+const cRolodex = "2";
 
 const cCookieName = "reviewlist";
+const cCookieTimeout = 180;
 
 const gblReviewAdd ="Add to Review list?";
 const gblReviewRemove ="Remove from Review list?";
@@ -756,6 +981,7 @@ var gblTmpVerbs = [] ;
 
 function initControls() {
 
+  var idx = 0;
 
 	// Initialize verb dropdown control
 	const ary = [];
@@ -795,13 +1021,71 @@ function initControls() {
 	}); 
 	
 
-	// Set review flags in any saved verbs in cookies
-	load_saved_review_flags() ;
+	// Get any saved cookie settings	
+	getSavedSettings();
 
-	
+
 	return;
 }
 
+
+function getSavedSettings() {
+
+  load_saved_cookie("verb", document.getElementById("ddVerbs"));
+	load_saved_cookie("tense", document.getElementById("ddTenses"));
+	load_saved_cookie("person", document.getElementById("ddPersons"));
+	load_saved_cookie("translation", document.getElementById("ddTranslation"));
+	load_saved_cookie("presentation", document.getElementById("ddPresentation"));
+	load_saved_cookie("infinitiveonly", document.getElementById("infinitiveOnly"));
+	load_saved_cookie("timer", document.getElementById("ddTimer"));
+
+	// We need to check whether a filter (subset) was saved.
+	// If so, we need to populate the verb dropdown list with 
+	// the associated subset. If the subset is "review", we
+	// load the saved verbs in a separate step 
+	 
+	// First, set review flags in any saved verbs in cookies
+	let cntSaved = load_saved_review_flags() ;
+
+
+  if (document.getElementById("ddSubset").selectedIndex > 0) {
+		if (cntSaved > 0) {
+			load_saved_cookie("subset", document.getElementById("ddSubset"));
+		}
+		gblSubset = getCookie("subset");
+		update_subset_check();
+	} 
+
+}
+
+
+
+
+function resetDefaults() {
+
+	delete_cookie("verb");
+	delete_cookie("tense");
+	delete_cookie("person");
+	delete_cookie("translation");
+	delete_cookie("presentation");
+	delete_cookie('infinitiveonly');
+	delete_cookie("timer");
+	delete_cookie("subset");
+	delete_cookie("reviewlist")
+ 
+  clearReviewFlags();
+
+  //window.location.reload();
+	getSavedSettings();
+
+}
+
+
+
+function findIndexfromOptionName( select, srch ) {
+    let opts = select.options;
+    return opts.findIndex( opt => opt.value == srch );
+}
 
 // **************************************************************************
 //
@@ -809,11 +1093,11 @@ function initControls() {
 //
 // **************************************************************************
 
-function setCookie(cname,cvalue,exdays) {
+function setCookie(cname,cvalue) {
   const d = new Date();
-  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  d.setTime(d.getTime() + (cCookieTimeout*24*60*60*1000));
   let expires = "expires=" + d.toUTCString();
-  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/; SameSite=Strict" ;
 }
 
 function getCookie(cname) {
@@ -833,9 +1117,10 @@ function getCookie(cname) {
 }
 
 
-function del_cookie(name, exp) {
-    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+function delete_cookie(name) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 } 
+
 
 function displayCookie() {
   let exdays = 10;	
@@ -843,29 +1128,49 @@ function displayCookie() {
   d.setTime(d.getTime() - (exdays*24*60*60*1000));
 
 
-  del_cookie("username", d.toUTCString());
-  setCookie("username", "[]", 10);
+  delete_cookie("username", d.toUTCString());
+  setCookie("username", "[]");
   let user = getCookie("username");
   let div = document.querySelector('#test');
   div.innerHTML = d.toUTCString() + '<p>' + getCookie("username") + '<p>' + decodeURIComponent(document.cookie);
 }
 
 
+function load_saved_cookie(pCookie, pControl) {
+	let str = getCookie(pCookie);
+	let idx = 0;
+	if (str.length > 0) {
+    idx = Array.apply(null, pControl.options).map(function(el) {return el.value}).indexOf(str);
+		pControl.selectedIndex = idx;
+	}
+
+}
+
+
 function load_saved_review_flags() {
 	
 	let str = getCookie(cCookieName);  //Get the cookie with saved values
-	let ary = str.split(",");
-	var idx = 0;
+	if (str.length > 0) {
+		let ary = str.split(",");
+		var idx = 0;
 
-	if (ary.length > 0) {
-		for (var i = 0; i < ary.length; i++) {
-			idx = parseInt(ary[i]);
-			spVerbs[idx].review = true;
-		}
-	} 
+		if (ary.length > 0) {
+			for (var i = 0; i < ary.length; i++) {
+				idx = parseInt(ary[i]);
+				spVerbs[idx].review = true;
+			}
+		} 
+	}
 
-	return;
+	return (str.length);
 
+}
+
+function clearReviewFlags() {
+
+	for (var i = 0; i < spVerbs.length; i++) {
+		spVerbs[i].review = false;
+	}
 }
 
 
@@ -1683,13 +1988,16 @@ function firstUpper(str){
 }
 
 
-function update_subset_check(pOpt) {
+function update_subset_check() {
+
+	closeNav(); //Close possible open Nav/Doc pop-ups
 
   let ddSubset = document.getElementById("ddSubset");
   let ddVerbs = document.getElementById("ddVerbs");
 
   gblSubset = ddSubset.value.toLowerCase();
   let strSubset = gblSubset;
+  setCookie("subset", strSubset);  //Save the value
 
 
 	// Check whether we're working on a subset of verbs (e.g., Special Handling  )
@@ -1770,7 +2078,26 @@ function update_subset_check(pOpt) {
   					ddVerbs.add(option);
 					}
 			}
+		} else if (strSubset == "power") {
+			gblTmpVerbs = [] ;
+			var idxVerb = -1;
+			for(var i = 0; i < ary.length; i++) {
+					idxVerb = get_verb_info(ary[i]);
+					if (spVerbs[idxVerb].power == true) {
+						gblTmpVerbs.push(ary[i]);	
+	 					const option = document.createElement("option");
+  					option.value = ary[i];
+  					option.text = decodeHTMLEntities(ary[i]);
+  					ddVerbs.add(option);
+					}
+			}
 
+			//Pre-select Present Tense, if "Power" subset
+			if ( 1==1 ) {
+				document.getElementById("ddTenses").selectedIndex = cPresent + 1;
+				update_tense_check();
+			}
+	
 		}
 	
 		if (ddSubset.selectedIndex > 0) {
@@ -1790,6 +2117,8 @@ function get_verb_info(pVerb) {
 
 function update_verb_check() {
 
+	closeNav(); //Close possible open Nav/Doc pop-ups
+
 	gblVerb = document.getElementById("ddVerbs").value; 
 	if (gblVerb.length == 0) {
 		gblVerbSaved = 0;
@@ -1797,48 +2126,68 @@ function update_verb_check() {
 		gblPersonSaved = 0;
 	}
 
+	setCookie("verb", gblVerb);
+
 }
 
 function update_tense_check() {
 
-	gblTense = document.getElementById("ddTenses").value; 
+	closeNav(); //Close possible open Nav/Doc pop-ups
+
+	gblTense = document.getElementById("ddTenses").value;
+	setCookie("tense", gblTense); 
 
 }
 
 function update_person_check() {
 
+	closeNav(); //Close possible open Nav/Doc pop-ups
+
 	gblPerson = document.getElementById("ddPersons").value; 
+	setCookie("person", gblPerson);
 
 }
 
 
 function timer_check() {
 
-	gblTimer = document.getElementById("timer").value;
+	closeNav(); //Close possible open Nav/Doc pop-ups
+
+	gblTimer = document.getElementById("ddTimer").value;
 	if (gblTimer == "answer") {
 		document.getElementById("show-answer-btn").style.visibility = "visible";
 	} else {
 		document.getElementById("show-answer-btn").style.visibility = "hidden";
 	} 
 
+  setCookie("timer", gblTimer); 
+
 }
 
 function translation_check() {
  
-	gblTranslationDirection = document.getElementById("translation").value;
+	closeNav(); //Close possible open Nav/Doc pop-ups
+
+	gblTranslationDirection = document.getElementById("ddTranslation").value;
+	setCookie("translation", gblTranslationDirection);
 	
 }
 
 function presentation_check() {
 
-	gblPresentation = document.getElementById("presentation").value;
+	closeNav(); //Close possible open Nav/Doc pop-ups
+
+	gblPresentation = document.getElementById("ddPresentation").value;
+	setCookie("presentation", gblPresentation);
 
 }
 
 function infinitive_only_check() {
 
-	gblInfinitiveOnly = document.getElementById("infinitiveOnly").value;
+	closeNav(); //Close possible open Nav/Doc pop-ups
 
+	gblInfinitiveOnly = document.getElementById("infinitiveOnly").value;
+	setCookie(infinitiveonly, "gblInfinitiveOnly");
 }
 
 function fnMain() {
@@ -1979,13 +2328,17 @@ function fnMain() {
     } 
 
 
-    del_cookie(cCookieName);
-    setCookie(cCookieName, strCookie, 60);
+    delete_cookie(cCookieName);
+    setCookie(cCookieName, strCookie);
 
   }
 
 
   function showNextCard() {
+
+  	// Close any open Navigation/Documentation
+
+  	closeNav();
 
 		let obj = fnMain(); // Returns the English phrase, and Spanish
 		let verb = obj.verb;
